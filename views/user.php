@@ -268,6 +268,7 @@
       <!-- Main content -->
       <section class="content">
 
+      <a href="../includes/_sessions/cerrarSesion.php">Cerrar sesión</a>
 
       <div id="content-container"></div>
 
