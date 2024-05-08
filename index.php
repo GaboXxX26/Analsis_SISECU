@@ -60,7 +60,7 @@ if( $validar == null || $validar == ''){
 
                                     <div class="form-group">
                                         <label for="genero" class="form-label">Genero:</label>
-                                            <select id="genero" name="genero" required>
+                                            <select class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                                 <option value="Masculino">Masculino</option>
                                                 <option value="Femenino">Femenino</option>
                                                 <option value="Otro">Otro</option>
@@ -83,7 +83,7 @@ if( $validar == null || $validar == ''){
                                     </div>
                                     <div class="form-group">
                                         <label for="rol_id" class="form-label">Rol:</label>
-                                            <select id="rol_id" name="rol_id" required>
+                                            <select class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                                 <option value="ad2e8033-4a14-40d6-a999-1f1c6467a5e6">Analista de datos</option>
                                                 <option value="add38db6-1687-4e57-a763-a959400d9da2">Administrador</option>
                                                 <option value="e17a74c4-9627-443c-b020-23dc4818b718">Usuario</option>
@@ -92,7 +92,7 @@ if( $validar == null || $validar == ''){
 
                                     <div class="form-group">
                                         <label for="id_centro" class="form-label">Centro ECU911:</label>
-                                            <select id="id_centro" name="id_centro" required>
+                                            <select class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"required>
                                                 <option value="ef48298f-cedf-4718-aa67-b097c80ef23b">Ambato</option>
                                                 <option value="664f5ba3-84e3-40f9-afc3-2fc1a152f88b">Cuenca</option>
                                                 <option value="ed587387-5f05-4b86-8bdc-db81d95d5acf">Loja</option>
