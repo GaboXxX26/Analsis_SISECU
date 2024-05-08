@@ -28,6 +28,9 @@ if( $validar == null || $validar == ''){
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+      <script src="https://code.jquery.com/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
@@ -268,11 +271,7 @@ if( $validar == null || $validar == ''){
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
     <!-- / Layout wrapper -->
-    <!-- <script>
-        $(document).ready(function() {
-          $('.table_responsive').DataTable();
-        });
-      </script> -->
+
 
 
     <!-- Core JS -->
@@ -312,5 +311,10 @@ function loadContent(url) {
 }
 
     </script>
+        <script>
+        $(document).ready(function() {
+          $('.table_responsive').DataTable();
+        });
+      </script> 
 </body>
 </html>
