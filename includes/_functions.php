@@ -22,7 +22,7 @@ function editar_registro()
 {
     global $pdo;
     extract($_POST);
-    $consulta = "UPDATE public.user SET nombre = :nombre, apellido = :apellido, correo = :correo, telefono = :telefono, dni = :dni, genero = :genero, direccion = :direccion, fecha_nacimiento = :fecha_nacimiento, password = :password , rol_id = :rol_id, id_centro = :id_centro WHERE id = :id";
+    $consulta = "UPDATE public.user SET nombre = :nombre, apellido = :apellido, correo = :correo, telefono = :telefono, dni = :dni, genero = :genero, direccion = :direccion, fecha_nacimiento = :fecha_nacimiento, password = :password , rol_id = :rol_id, id_centro = :id_centro, estado= :estado WHERE id = :id";
     $stmt = $pdo->prepare($consulta);
     $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
     $stmt->bindParam(':apellido', $apellido, PDO::PARAM_STR);
@@ -35,7 +35,9 @@ function editar_registro()
     $stmt->bindParam(':password', $password, PDO::PARAM_STR);
     $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_STR);
     $stmt->bindParam(':id_centro', $id_centro, PDO::PARAM_STR);
+    $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
     $stmt->execute();
 
     header('Location: ../views/user.php');

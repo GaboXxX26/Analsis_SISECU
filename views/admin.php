@@ -19,7 +19,7 @@ if ($validar == null || $validar == '') {
 <table id="example2" class="table table-bordered table-hover table-responsive">
   <thead>
     <tr>
-      <th>Cedula</th>
+      <th>Estado</th>
       <th>Nombre</th>
       <th>Apellido</th>
       <th>Correo</th>
@@ -31,7 +31,7 @@ if ($validar == null || $validar == '') {
   <tbody>
     <?php
     // Consulta SQL para obtener todos los usuarios
-    $consulta = "SELECT u.id, u.nombre, u.apellido, u.correo, u.telefono, u.dni, u.genero, u.direccion, u.fecha_nacimiento, u.password, p.rol, c.nombre_pro FROM public.user as u
+    $consulta = "SELECT u.estado, u.id, u.nombre, u.apellido, u.correo, p.rol, c.nombre_pro FROM public.user as u
       LEFT Join permisos as p ON u.rol_id = p.id
       LEFT JOIN centro as c ON c.id_centro=u.id_centro";
 
@@ -41,7 +41,7 @@ if ($validar == null || $validar == '') {
     if ($stmt->rowCount() > 0) {
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo "<tr>";
-        echo "<td>" . $row['dni'] . "</td>";
+        echo "<td>" . $row['estado'] . "</td>";
         echo "<td>" . $row['nombre'] . "</td>";
         echo "<td>" . $row['apellido'] . "</td>";
         echo "<td>" . $row['correo'] . "</td>";

@@ -6,10 +6,24 @@ error_reporting(0);
 $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
-
   header("Location: ../includes/login.php");
   die();
 }
+
+// Verificar si el usuario está activo
+$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$usuario || $usuario['estado'] != 'Activo') {
+  // El usuario no existe o no está activo
+  // Redirigir a una página de error o mostrar un mensaje
+  header("Location: ../views/acceso_denegado.php");
+  die();
+}
+
 ?>
 
 <!DOCTYPE html>
