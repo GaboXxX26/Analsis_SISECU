@@ -47,7 +47,7 @@ function eliminar_registro()
 {
     global $pdo;
     $id = $_POST['id'];
-    $consulta = "DELETE FROM public.user WHERE id = :id";
+    $consulta = "UPDATE public.user SET estado = 'Inactivo' WHERE id = :id";
 
     $stmt = $pdo->prepare($consulta);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);

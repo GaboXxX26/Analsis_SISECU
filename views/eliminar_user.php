@@ -26,7 +26,7 @@ if (!isset($_SESSION['correo']) || empty($_SESSION['correo'])) {
     <div class="row">
     <div class="col-sm-6 offset-sm-3">
     <div class="alert alert-danger text-center">
-    <p>¿Desea confirmar la eliminacion del registro?</p>
+    <p>¿Desea desactivar el Usuario?</p>
     </div>
 
     <div class="row">

@@ -52,7 +52,7 @@ if ($validar == null || $validar == '') {
               <a class="btn btn-app" href="editar_user.php?id=' . $row['id'] . '" > 
               <i class="fas fa-edit"></i>Editar</a>
               <a class="btn btn-app" href="eliminar_user.php?id=' . $row['id'] . '">
-              <i class="fas fa-users"></i> Desactivas </a>
+              <i class="fas fa-users"></i> Desactivar </a>
             </td>';
         echo "</tr>\n";
       }
