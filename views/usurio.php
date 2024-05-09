@@ -32,7 +32,8 @@ if ($validar == null || $validar == '') {
     // Consulta SQL para obtener todos los usuarios
     $consulta = "SELECT u.id, u.nombre, u.apellido, u.correo, u.telefono, u.dni, u.genero, u.direccion, u.fecha_nacimiento, u.password, p.rol, c.nombre_pro FROM public.user as u
       LEFT Join permisos as p ON u.rol_id = p.id
-      LEFT JOIN centro as c ON c.id_centro=u.id_centro";
+      LEFT JOIN centro as c ON c.id_centro=u.id_centro
+      WHERE u.estado = 'Activo' ";
 
     $stmt = $pdo->query($consulta);
 
