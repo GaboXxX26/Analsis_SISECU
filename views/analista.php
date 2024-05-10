@@ -76,7 +76,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
         <li class="nav-item d-none d-sm-inline-block">
           <a href="index3.html" class="nav-link">Inicio</a>
         </li>
-        
+
       </ul>
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">

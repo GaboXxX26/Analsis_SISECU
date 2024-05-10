@@ -77,7 +77,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
         <li class="nav-item d-none d-sm-inline-block">
           <a href="index3.html" class="nav-link">Inicio</a>
         </li>
-        
+
       </ul>
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
@@ -139,13 +139,13 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
               </a>
             </li>
             <li class="nav-item">
-            <a href="#" class="nav-link" onclick="loadContent('tabla_user.php')">
-              <i class="nav-icon fas fa-table"></i>
-              <p>
-                Indicadores
-              </p>
-            </a>
-          </li>
+              <a href="#" class="nav-link" onclick="loadContent('tabla_user.php')">
+                <i class="nav-icon fas fa-table"></i>
+                <p>
+                  Indicadores
+                </p>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- /.sidebar-menu -->

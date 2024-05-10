@@ -116,7 +116,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <label for="estado" class="form-label">Genero:</label>
                                 <select id="estado" name="estado" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" <?php echo $usuario['estado']; ?>>
                                     <option value="Activo" <?php echo ($usuario['estado'] == 'Activo') ? 'selected' : ''; ?>> Activo</option>
-                                    <option value="Inactivo" <?php echo ($usuario['Estado'] == 'Inactivo') ? 'selected' : ''; ?>>Inactivo</option>
+                                    <option value="Inactivo" <?php echo ($usuario['estado'] == 'Inactivo') ? 'selected' : ''; ?>>Inactivo</option>
                                 </select>
                             </div>
 

@@ -34,7 +34,7 @@ if (!isset($_SESSION['correo']) || empty($_SESSION['correo'])) {
             <form action="../includes/_functions.php" method="POST">
                 <input type="hidden" name="accion" value="eliminar_registro">
                 <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
-                <input type="submit" name="" value="Eliminar" class= " btn btn-danger">
+                <input type="submit" name="" value="Desactivar" class= " btn btn-danger">
                 <a href="user.php" class="btn btn-success">Cancelar</a>
 
                                
