@@ -136,9 +136,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
             <li class="nav-item">
               <a href="#" class="nav-link" onclick="loadContent('tabla_admin.php')">
                 <i class="nav-icon fas fa-table"></i>
-                <p>
-                  Indicadores
-                </p>
+                <p>Indicadores</p>
               </a>
             <li class="nav-item">
               <a href="#" class="nav-link" onclick="loadContent('../index.php')">
@@ -146,6 +144,12 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
                 <p>
                   Nuevo usuario
                 </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
+                <i class="nav-icon far fa-plus-square"></i>
+                <p>Cargar Excel</p>
               </a>
             </li>
           </ul>
