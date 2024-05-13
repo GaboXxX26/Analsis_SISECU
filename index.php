@@ -111,6 +111,7 @@ if ($validar == null || $validar == '') {
                                     <option value="2dbf73c0-17f0-44c3-bf3e-6cffe40264d1">Nueva Loja</option>
                                     <option value="1fb38bb6-59bc-4272-8e08-0dcbf43516dc">Santo Domingo</option>
                                     <option value="054c93ab-fc9c-435f-bf6b-0dabcf4cce5e">Samborondón</option>
+                                    <option value="141ef0a0-4102-4f44-99bd-59e52d314e8c">Ibarra</option>
                                 </select>
                             </div>
 
