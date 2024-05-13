@@ -19,13 +19,13 @@
     <div class="col-md-6">
         <!-- general form elements -->
         <div class="card card-primary">
-            <form action="procesar_archivo.php" method="post" enctype="multipart/form-data">
+            <form action="../includes/procesar_archivo.php" method="post" enctype="multipart/form-data">
                 <div class="card-body">
                     <div class="form-group">
                         <label for="exampleInputFile">Archivo Excel</label>
                         <div class="input-group">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="exampleInputFile">
+                                <input type="file" class="custom-file-input" id="excelfile" name="excelfile">
                                 <label class="custom-file-label" for="exampleInputFile">Elija un archivo</label>
                             </div>
                         </div>
@@ -34,7 +34,7 @@
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Subir</button>
                 </div>
             </form>
         </div>
@@ -82,7 +82,9 @@
                                     <input type="hidden" id="id_centro_1" name="id_centro_1" class="form-control" value="ef48298f-cedf-4718-aa67-b097c80ef23b" style="width: 100%;">
                                     <span>Ambato</span>
                                 </td>
-                                <td> <input id=" conve_stra_1" name="conve_stra_1" type="number" class="form-control " style="width: 100%;" min="0" max="10" step="0.1" readonly></td>
+                                <td>
+                                     <input id=" conve_stra_1" name="conve_stra_1" type="number" class="form-control " style="width: 100%;" min="0" max="10" step="0.1" readonly>
+                                    </td>
                                 <td>
                                     <input type="number" id="comp_insti_1" name="comp_insti_1" class="form-control " style="width: 100%;" min="0" max="10" step="0.1" readonly>
                                 </td>
