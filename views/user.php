@@ -33,7 +33,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Administrador</title>
-
+  <link rel="icon" type="image/x-icon" href="../Resources/img/favicon/favicon.ico" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -134,7 +134,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('tabla_admin.php')">
+              <a href="#" class="nav-link" onclick="loadContent('../includes/procesar_centro.php')">
                 <i class="nav-icon fas fa-table"></i>
                 <p>Indicadores</p>
               </a>
