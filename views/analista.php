@@ -132,7 +132,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('tabla_user.php')">
+              <a href="#" class="nav-link" onclick="loadContent('archivo.php')">
                 <i class="nav-icon fas fa-table"></i>
                 <p>
                   Indicadores
@@ -162,8 +162,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
       <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
-
-
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">

@@ -16,15 +16,6 @@
 
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
-    <!-- Navbar -->
-
-    <!-- /.navbar -->
-
-    <!-- Main Sidebar Container -->
-
-
-    <!-- Content Wrapper. Contains page content -->
-
     <!-- Main content -->
     <section class="content">
       <div class="error-page">
@@ -32,10 +23,9 @@
 
         <div class="error-content">
           <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found.</h3>
-
           <p>
             We could not find the page you were looking for.
-            Meanwhile, you may <a href="../../index.html">return to dashboard</a> or try using the search form.
+            Meanwhile, you may <a href="../includes/login.php">return to dashboard</a> or try using the search form.
           </p>
         </div>
         <!-- /.error-content -->
@@ -46,19 +36,12 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.2.0
-    </div>
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad SIS ECU911</a>.</strong> Todos los derechos reservados
   </footer>
-
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
   </aside>
-
-  <!-- ./wrapper -->
-
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- Bootstrap 4 -->

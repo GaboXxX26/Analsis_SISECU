@@ -59,6 +59,10 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="../bootstrap-5.3.3-dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <script src="../bootstrap-5.3.3-dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -76,7 +80,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="index3.html" class="nav-link">Inicio</a>
+          <a href="#" class="nav-link">Inicio</a>
         </li>
 
       </ul>
@@ -120,7 +124,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-            <li class="nav-item menu-open">
+            <li class="nav-item">
               <a href="user.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
@@ -135,7 +139,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('../includes/procesar_centro.php')">
+              <a href="#" class="nav-link" onclick="loadContent('tabla_admin.php')">
                 <i class="nav-icon fas fa-table"></i>
                 <p>Indicadores</p>
               </a>
@@ -159,7 +163,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
       </div>
       <!-- /.sidebar -->
     </aside>
-
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -176,8 +179,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
       <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
-
-
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">
@@ -197,9 +198,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
     <footer class="main-footer">
       <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
-
     </footer>
-
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
@@ -292,7 +291,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
         .catch(error => console.error('Error:', error));
     }
   </script>
-
 </body>
 
 </html>

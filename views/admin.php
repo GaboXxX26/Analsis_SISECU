@@ -48,7 +48,7 @@ if ($validar == null || $validar == '') {
         echo "<td>" . $row['correo'] . "</td>";
         echo "<td>" . $row['nombre_centro'] . "</td>";
         echo "<td>" . $row['rol'] . "</td>";
-        echo '<td>
+        echo '<td>        
               <a class="btn btn-app" href="editar_user.php?id=' . $row['id'] . '" > 
               <i class="fas fa-edit"></i>Editar</a>
               <a class="btn btn-app" href="eliminar_user.php?id=' . $row['id'] . '">
@@ -67,3 +67,32 @@ if ($validar == null || $validar == '') {
     ?>
   </tbody>
 </table>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var userId;
+
+    $('#exampleModal').on('show.bs.modal', function(event) {
+      var button = $(event.relatedTarget); // Botón que activó el modal
+      userId = button.data('id'); // Extraer la información del atributo data-id
+    });
+
+    $('#confirmDeactivate').click(function() {
+      $.ajax({
+        url: 'eliminar_user.php',
+        type: 'POST',
+        data: {
+          id: userId
+        },
+        success: function(response) {
+          $('#exampleModal').modal('hide');
+          // Aquí puedes actualizar la UI para reflejar la desactivación, si es necesario
+          alert('Usuario desactivado exitosamente');
+        },
+        error: function() {
+          alert('Error al desactivar el usuario');
+        }
+      });
+    });
+  });
+</script>
