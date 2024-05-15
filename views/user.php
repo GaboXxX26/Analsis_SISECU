@@ -24,6 +24,29 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   die();
 }
 
+$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$_SESSION['rol_id'] = $usuario['rol_id'];
+
+// Definir permisos por rol
+$permisos = [
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+
+];
+
+// Verificar si el usuario tiene permiso para la página actual
+$pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
+if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
+  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+  die();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +56,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Administrador</title>
-  <link rel="icon" type="image/x-icon" href="../Resources/img/favicon/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -59,10 +82,9 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-
-  <link rel="stylesheet" href="../bootstrap-5.3.3-dist/css/bootstrap.min.css" crossorigin="anonymous">
-  <script src="../bootstrap-5.3.3-dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-
+  <!-- Para el formulairo de registro -->
+  <link rel="stylesheet" href="./css/es.css">
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -144,7 +166,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
                 <p>Indicadores</p>
               </a>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('../index.php')">
+              <a href="#" class="nav-link" onclick="loadContent('index.php')">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>
                   Nuevo usuario

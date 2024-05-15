@@ -23,16 +23,37 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   header("Location: ../views/acceso_denegado.php");
   die();
 }
+$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$_SESSION['rol_id'] = $usuario['rol_id'];
+
+// Definir permisos por rol
+$permisos = [
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php','tabla_admin.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'=>['analista.php']
+
+];
+
+// Verificar si el usuario tiene permiso para la página actual
+$pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
+if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
+    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+    die();
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Administrador</title>
-
+  <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -181,9 +202,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
     <footer class="main-footer">
       <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
-
     </footer>
-
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
@@ -191,7 +210,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
     <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
-
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -226,7 +244,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   <script src="../dist/js/demo.js"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
   <script src="../dist/js/pages/dashboard.js"></script>
-
   <!-- DataTables  & Plugins -->
   <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
   <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -260,7 +277,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
       });
     });
   </script>
-
+  <!-- cargar pagina sin neceidad de cargar rutas  -->
   <script>
     function loadContent(url) {
       fetch(url)

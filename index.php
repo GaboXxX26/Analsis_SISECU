@@ -1,132 +1,82 @@
-<?php
-
-session_start();
-error_reporting(0);
-
-$validar = $_SESSION['correo'];
-
-if ($validar == null || $validar == '') {
-
-    header("Location: ./includes/login.php");
-    die();
-}
-
-?>
 <!DOCTYPE html>
-<html lang="es-MX">
+<html lang="en" class="light-style layout-wide customizer-hide" dir="ltr" data-theme="theme-default" data-assets-path="./Resources/" data-template="vertical-menu-template-free">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registros</title>
-
-    <link rel="stylesheet" href="./css/es.css">
-    <link rel="stylesheet" href="./css/styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>Cuadro Mando y Gestion</title>
+    <meta name="description" content="" />
+    <link rel="icon" type="image/x-icon" href="./Resources/images/ECU911.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./Resources/vendor/fonts/boxicons.css" />
+    <link rel="stylesheet" href="./Resources/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="./Resources/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="./Resources/css/demo.css" />
+    <link rel="stylesheet" href="./Resources/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="./Resources/vendor/css/pages/page-auth.css" />
+    <script src="./Resources/vendor/js/helpers.js"></script>
+    <script src="./Resources/js/config.js"></script>
 </head>
 
-<body id="page-top">
-    <form action="../includes/validar.php" method="POST">
-        <div id="login">
-            <div class="container">
-                <div id="login-row" class="row justify-content-center align-items-center">
-                    <div id="login-column" class="col-md-6">
-                        <div id="login-box" class="col-md-12">
-
-                            <br>
-                            <h3 class="text-center">Registro de nuevo usuario</h3>
-                            <div class="form-group">
-                                <label for="nombre" class="form-label">Nombre: </label>
-                                <input type="text" id="nombre" name="nombre" class="form-control" require>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="apellido" class="form-label">Apellido:</label>
-                                <input type="text" id="apellido" name="apellido" class="form-control" require>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="username">Correo:</label><br>
-                                <input type="email" name="correo" id="correo" class="form-control" placeholder="" require>
-                            </div>
-                            <div class="form-group">
-                                <label for="telefono" class="form-label">Telefono:</label>
-                                <input type="text" id="telefono" name="telefono" class="form-control" require>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="dni" class="form-label">Cedula:</label>
-                                <input type="text" id="dni" name="dni" class="form-control" require>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="genero" class="form-label">Género:</label>
-                                <select id="genero" name="genero" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;">
-                                    <option value="" disabled selected>Seleccione una opción</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="direccion" class="form-label">Direccion:</label>
-                                <input type="text" id="direccion" name="direccion" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
-                                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password">Contraseña:</label><br>
-                                <input type="password" name="password" id="password" class="form-control" require>
-                            </div>
-                            <div class="form-group">
-                                <label for="rol_id" class="form-label">Rol:</label>
-                                <select id="rol_id" name="rol_id" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" require>
-                                    <option value="" disabled selected>Seleccione una opción</option>
-                                    <option value="ad2e8033-4a14-40d6-a999-1f1c6467a5e6">Analista de datos</option>
-                                    <option value="add38db6-1687-4e57-a763-a959400d9da2">Administrador</option>
-                                    <option value="e17a74c4-9627-443c-b020-23dc4818b718">Usuario</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="id_centro" class="form-label">Centro ECU911:</label>
-                                <select id="id_centro" name="id_centro" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" require>
-                                    <option value="" disabled selected>Seleccione una opción</option>
-                                    <option value="ef48298f-cedf-4718-aa67-b097c80ef23b">Ambato</option>
-                                    <option value="664f5ba3-84e3-40f9-afc3-2fc1a152f88b">Cuenca</option>
-                                    <option value="ed587387-5f05-4b86-8bdc-db81d95d5acf">Loja</option>
-                                    <option value="e9003437-c828-465a-b0ec-b50f7395a2b2">Esmeraldas</option>
-                                    <option value="e3eb2897-7999-4418-bd04-d0a33e3a84f6">Quito</option>
-                                    <option value="e1420c15-5f78-4815-8f27-c4df1793bc21">Babahoyo</option>
-                                    <option value="caba5421-1581-49db-a4c2-2a8c3b39d238">Riobamba</option>
-                                    <option value="c9ffaf46-4ba8-4515-aac7-58bdc923f197">Tulcán</option>
-                                    <option value="833397ec-c152-40e0-8a3b-536455dd1982">Machala</option>
-                                    <option value="525c8421-6961-47fd-a630-1819594c9ecc">San Cristóbal</option>
-                                    <option value="42a9c5de-2fa9-47cb-9707-a6bade35fdc5">Portoviejo</option>
-                                    <option value="2dbf73c0-17f0-44c3-bf3e-6cffe40264d1">Nueva Loja</option>
-                                    <option value="1fb38bb6-59bc-4272-8e08-0dcbf43516dc">Santo Domingo</option>
-                                    <option value="054c93ab-fc9c-435f-bf6b-0dabcf4cce5e">Samborondón</option>
-                                    <option value="141ef0a0-4102-4f44-99bd-59e52d314e8c">Ibarra</option>
-                                </select>
-                            </div>
-
-                            <input type="hidden" id="estado" name="estado" value="Activo">
-
+<body>
+    <!-- Content -->
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner">
+                <div class="card">
+                    <img class="img-login" src="./Resources/images/ECU911.png" />
+                    <h1 class="custom-heading red-first-letter text-center">CMG</h1>
+                    <br />
+                    <h2 class="custom-heading text-center">
+                        <span class="red-first-letter">C</span>uadro
+                        <span class="red-first-letter">M</span>ando y
+                        <span class="red-first-letter">G</span>estión
+                    </h2>
+                    <h2 class="custom-heading text-gray text-center">INICIAR SESION</h2>
+                    <div class="card-body">
+                        <form id="formAuthentication" class="mb-3" action="_functions.php" method="POST">
                             <div class="mb-3">
-                                <input type="submit" value="Guardar" class="btn btn-success" name="registrar">
-                                <a href="../views/user.php" class="btn btn-danger">Cancelar</a>
+                                <label for="correo" class="form-label">Correo:</label><br>
+                                <input type="text" name="correo" id="correo" class="form-control" placeholder="Ingresa tu correo institucional" required>
                             </div>
-                        </div>
+                            <div class="mb-3 form-password-toggle">
+                                <div class="d-flex justify-content-between">
+                                    <label for="password" class="form-label">Contraseña:</label><br>
+                                    <a href="#">
+                                        <small>¿Has olvidado la contraseña?</small>
+                                    </a>
+                                </div>
+                                <div class="input-group input-group-merge">
+
+                                    <input type="password" id="password" class="form-control" name="password" aria-describedby="password" require />
+                                    <input type="hidden" name="accion" value="acceso_user">
+                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="remember-me" />
+                                    <label class="form-check-label" for="remember-me"> Recordar </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input type="submit" class="tn btn-primary d-grid w-100s" value="Ingresar">
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
+    <script src="./Resources/vendor/libs/jquery/jquery.js"></script>
+    <script src="./Resources/vendor/libs/popper/popper.js"></script>
+    <script src="./Resources/vendor/js/bootstrap.js"></script>
+    <script src="./Resources/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="./Resources/vendor/js/menu.js"></script>
+    <script src="./Resources/js/main.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
 
 </html>
