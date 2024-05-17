@@ -31,8 +31,10 @@ if (isset($_POST['registrar'])) {
         $id_centro = trim($_POST['id_centro']);
         $estado = trim($_POST['estado']);
 
+        $password_hash = password_hash($password, PASSWORD_BCRYPT);
+
         $consulta = "INSERT INTO public.user (id, nombre, apellido, correo, telefono, dni, genero, direccion, fecha_nacimiento, password, rol_id, id_centro, estado) 
-        VALUES (uuid_generate_v4(), :nombre, :apellido, :correo, :telefono, :dni, :genero, :direccion, :fecha_nacimiento, :password,:rol_id, :id_centro, :estado)";
+        VALUES (uuid_generate_v4(), :nombre, :apellido, :correo, :telefono, :dni, :genero, :direccion, :fecha_nacimiento, :password_hash,:rol_id, :id_centro, :estado)";
 
 
         $stmt = $pdo->prepare($consulta);
@@ -45,7 +47,7 @@ if (isset($_POST['registrar'])) {
             'genero' => $genero,
             'direccion' => $direccion,
             'fecha_nacimiento' => $fecha_nacimiento,
-            'password' => $password,
+            'password_hash' => $password_hash,
             'rol_id' => $rol_id,
             'id_centro' => $id_centro,
             'estado' => $estado

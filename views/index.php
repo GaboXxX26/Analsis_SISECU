@@ -6,45 +6,9 @@ error_reporting(0);
 $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
-    header("Location: ../includes/login.php");
-    die();
-}
 
-// Verificar si el usuario está activo
-$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$usuario || $usuario['estado'] != 'Activo') {
-    // El usuario no existe o no está activo
-    // Redirigir a una página de error o mostrar un mensaje
-    header("Location: ../views/acceso_denegado.php");
-    die();
-}
-
-$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$_SESSION['rol_id'] = $usuario['rol_id'];
-
-// Definir permisos por rol
-$permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
-
-];
-
-// Verificar si el usuario tiene permiso para la página actual
-$pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
-if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-    die();
+  header("Location: ./includes/login.php");
+  die();
 }
 ?>
 <form action="../includes/validar.php" method="POST">
@@ -53,19 +17,16 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <div id="login-row" class="row justify-content-center align-items-center">
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
-
                         <br>
                         <h3 class="text-center">Registro de nuevo usuario</h3>
                         <div class="form-group">
                             <label for="nombre" class="form-label">Nombre: </label>
                             <input type="text" id="nombre" name="nombre" class="form-control" require>
                         </div>
-
                         <div class="form-group">
                             <label for="apellido" class="form-label">Apellido:</label>
                             <input type="text" id="apellido" name="apellido" class="form-control" require>
                         </div>
-
                         <div class="form-group">
                             <label for="username">Correo:</label><br>
                             <input type="email" name="correo" id="correo" class="form-control" placeholder="" require>
@@ -74,12 +35,10 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                             <label for="telefono" class="form-label">Telefono:</label>
                             <input type="text" id="telefono" name="telefono" class="form-control" require>
                         </div>
-
                         <div class="form-group">
                             <label for="dni" class="form-label">Cedula:</label>
                             <input type="text" id="dni" name="dni" class="form-control" require>
                         </div>
-
                         <div class="form-group">
                             <label for="genero" class="form-label">Género:</label>
                             <select id="genero" name="genero" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;">
@@ -89,17 +48,14 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                                 <option value="Otro">Otro</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="direccion" class="form-label">Direccion:</label>
                             <input type="text" id="direccion" name="direccion" class="form-control">
                         </div>
-
                         <div class="form-group">
                             <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
                             <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control">
                         </div>
-
                         <div class="form-group">
                             <label for="password">Contraseña:</label><br>
                             <input type="password" name="password" id="password" class="form-control" require>
@@ -113,7 +69,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                                 <option value="e17a74c4-9627-443c-b020-23dc4818b718">Usuario</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="id_centro" class="form-label">Centro ECU911:</label>
                             <select id="id_centro" name="id_centro" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" require>
@@ -135,9 +90,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                                 <option value="141ef0a0-4102-4f44-99bd-59e52d314e8c">Ibarra</option>
                             </select>
                         </div>
-
                         <input type="hidden" id="estado" name="estado" value="Activo">
-
                         <div class="mb-3">
                             <input type="submit" value="Guardar" class="btn btn-success" name="registrar">
                             <a href="../views/user.php" class="btn btn-danger">Cancelar</a>

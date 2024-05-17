@@ -1,4 +1,7 @@
 <?php
+require '../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 session_start();
 error_reporting(0);
@@ -14,6 +17,7 @@ if ($validar == null || $validar == '') {
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Procesar Excel a Formulario</title>
     <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
@@ -42,9 +46,9 @@ if ($validar == null || $validar == '') {
                     <div class="card-body">
 
                         <?php
-                        require '../vendor/autoload.php';
+                        // require '../vendor/autoload.php';
 
-                        use PhpOffice\PhpSpreadsheet\IOFactory;
+                        // use PhpOffice\PhpSpreadsheet\IOFactory;
 
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             if (isset($_FILES["excelfile"]) && $_FILES["excelfile"]["error"] === UPLOAD_ERR_OK) {
@@ -160,8 +164,6 @@ if ($validar == null || $validar == '') {
             </div>
         </div>
     </div>
-
-
     <!-- DataTables  & Plugins -->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -169,7 +171,6 @@ if ($validar == null || $validar == '') {
     <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
     <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
     <script>
         $(function() {
             $("#example1").DataTable({
@@ -190,5 +191,4 @@ if ($validar == null || $validar == '') {
         });
     </script>
 </body>
-
 </html>

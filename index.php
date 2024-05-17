@@ -36,7 +36,7 @@
                     </h2>
                     <h2 class="custom-heading text-gray text-center">INICIAR SESION</h2>
                     <div class="card-body">
-                        <form id="formAuthentication" class="mb-3" action="_functions.php" method="POST">
+                        <form id="formAuthentication" class="mb-3" action="./includes/_functions.php" method="POST">
                             <div class="mb-3">
                                 <label for="correo" class="form-label">Correo:</label><br>
                                 <input type="text" name="correo" id="correo" class="form-control" placeholder="Ingresa tu correo institucional" required>
@@ -44,7 +44,7 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
                                     <label for="password" class="form-label">Contraseña:</label><br>
-                                    <a href="#">
+                                    <a href="./views/recuperar_clave.php">
                                         <small>¿Has olvidado la contraseña?</small>
                                     </a>
                                 </div>

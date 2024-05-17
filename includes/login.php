@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="light-style layout-wide customizer-hide" dir="ltr" data-theme="theme-default" data-assets-path="../Resources/" data-template="vertical-menu-template-free">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
@@ -18,6 +19,7 @@
     <script src="../Resources/vendor/js/helpers.js"></script>
     <script src="../Resources/js/config.js"></script>
 </head>
+
 <body>
     <!-- Content -->
     <div class="container-xxl">
@@ -34,7 +36,7 @@
                     </h2>
                     <h2 class="custom-heading text-gray text-center">INICIAR SESION</h2>
                     <div class="card-body">
-                    <form id="formAuthentication" class="mb-3" action="_functions.php" method="POST">
+                        <form id="formAuthentication" class="mb-3" action="_functions.php" method="POST">
                             <div class="mb-3">
                                 <label for="correo" class="form-label">Correo:</label><br>
                                 <input type="text" name="correo" id="correo" class="form-control" placeholder="Ingresa tu correo institucional" required>
@@ -42,25 +44,24 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
                                     <label for="password" class="form-label">Contraseña:</label><br>
-                                    <a href="#">
+                                    <a href="../views/recuperar_clave.php">
                                         <small>¿Has olvidado la contraseña?</small>
                                     </a>
                                 </div>
                                 <div class="input-group input-group-merge">
-
-                                    <input type="password" id="password" class="form-control" name="password" aria-describedby="password" require/>
+                                    <input type="password" id="password" class="form-control" name="password" aria-describedby="password" require />
                                     <input type="hidden" name="accion" value="acceso_user">
-                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide fa-regular fa-eye"></i></span>
                                 </div>
                             </div>
                             <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="remember-me" />
-                                            <label class="form-check-label" for="remember-me"> Recordar </label>
-                                        </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="remember-me" />
+                                    <label class="form-check-label" for="remember-me"> Recordar </label>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <input type="submit"class="tn btn-primary d-grid w-100s" value="Ingresar">   
+                                <input type="submit" class="tn btn-primary d-grid w-100s" value="Ingresar">
                             </div>
                         </form>
                     </div>
@@ -76,4 +77,5 @@
     <script src="../Resources/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
+
 </html>

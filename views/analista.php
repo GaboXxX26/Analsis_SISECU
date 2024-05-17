@@ -108,11 +108,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <i class="fas fa-expand-arrows-alt"></i>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
-            <i class="fas fa-th-large"></i>
-          </a>
-        </li>
       </ul>
       <div class="card-title">
         <a class="btn btn-block bg-gradient-danger" href="../includes/_sessions/cerrarSesion.php">Cerrar sesión</a>
@@ -174,7 +169,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Usuario</h1>
+              <h1 class="m-0">Analista</h1>
             </div><!-- /.col -->
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->

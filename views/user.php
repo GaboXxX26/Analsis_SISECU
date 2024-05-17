@@ -1,4 +1,5 @@
 <?php
+
 include "../includes/_db.php";
 session_start();
 error_reporting(0);
@@ -81,7 +82,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
   <!-- Para el formulairo de registro -->
   <link rel="stylesheet" href="./css/es.css">
   <link rel="stylesheet" href="./css/styles.css">
@@ -121,7 +121,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
     </nav>
     <!-- /.navbar -->
-
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
@@ -148,7 +147,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="user.php" class="nav-link ">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <i class="nav-icon fas fa-home"></i>
                 <p>
                   Inicio
                 </p>
@@ -156,7 +155,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             </li>
             <li class="nav-item">
               <a href="#" class="nav-link " onclick="loadContent('admin.php')">
-                <i class="nav-icon far fa-plus-square"></i>
+                <i class="nav-icon far fa-user"></i>
                 <p>Usuarios</p>
               </a>
             </li>
@@ -197,7 +196,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
-
       <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
@@ -228,7 +226,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
-
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -280,9 +277,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Bootstrap Bundle JS (incluye Popper) -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-  <!-- <script>
-  <!-- Page specific script -->
+
   <script>
     $(function() {
       $("#example1").DataTable({
@@ -313,6 +308,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         .catch(error => console.error('Error:', error));
     }
   </script>
-</body>
+  
 
 </html>

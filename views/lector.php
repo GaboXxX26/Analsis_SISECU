@@ -23,6 +23,7 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   header("Location: ../views/acceso_denegado.php");
   die();
 }
+
 $query = "SELECT rol_id FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':correo', $validar);
@@ -33,22 +34,22 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php','tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'=>['analista.php']
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 
 ];
 
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-    die();
+  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+  die();
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -79,14 +80,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 </head>
-
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Preloader -->
     <div class="preloader flex-column justify-content-center align-items-center">
       <img class="animation__shake" src="../dist/img/ECU911.png" alt="ECU911" height="60" width="60">
     </div>
-
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
       <!-- Left navbar links -->
@@ -102,15 +101,9 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Notifications Dropdown Menu -->
-
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
-            <i class="fas fa-th-large"></i>
           </a>
         </li>
       </ul>
@@ -119,7 +112,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
     </nav>
     <!-- /.navbar -->
-
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
@@ -127,7 +119,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>
-
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
@@ -178,7 +169,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
       <!-- /.sidebar -->
     </aside>
-
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -191,12 +181,8 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
-
-      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
-
-
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">
@@ -216,17 +202,13 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <footer class="main-footer">
       <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
-
     </footer>
-
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
     </aside>
     <!-- /.control-sidebar -->
   </div>
-  <!-- ./wrapper -->
-
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -261,7 +243,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../dist/js/demo.js"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
   <script src="../dist/js/pages/dashboard.js"></script>
-
   <!-- DataTables  & Plugins -->
   <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
   <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -295,7 +276,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
-
   <script>
     function loadContent(url) {
       fetch(url)
@@ -306,7 +286,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         .catch(error => console.error('Error:', error));
     }
   </script>
-
 </body>
 
 </html>
