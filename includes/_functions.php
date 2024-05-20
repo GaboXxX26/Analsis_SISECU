@@ -1,9 +1,14 @@
 <?php
 include "_db.php";
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
+
 if (isset($_POST['accion'])) {
     switch ($_POST['accion']) {
-        
+
         case 'editar_registro':
             editar_registro();
             break;
@@ -26,7 +31,27 @@ function editar_registro()
 {
     global $pdo;
     extract($_POST);
-    $consulta = "UPDATE public.user SET nombre = :nombre, apellido = :apellido, correo = :correo, telefono = :telefono, dni = :dni, genero = :genero, direccion = :direccion, fecha_nacimiento = :fecha_nacimiento, password = :password , rol_id = :rol_id, id_centro = :id_centro, estado= :estado WHERE id = :id";
+
+    // Verificar si se proporcionaron nuevas contraseñas
+    if (!empty($_POST['nueva_password']) && !empty($_POST['confirmar_password'])) {
+
+        // Validar que las nuevas contraseñas coincidan
+        if ($_POST['nueva_password'] !== $_POST['confirmar_password']) {
+            echo "<script>alert('Las nuevas contraseñas no coinciden.');</script>";
+            return; // Salir de la función si no coinciden
+        }
+
+        // Hashear la nueva contraseña
+        $nueva_password_hash = password_hash($_POST['nueva_password'], PASSWORD_BCRYPT);
+
+        // Actualizar la contraseña en la base de datos
+        $consulta = "UPDATE public.user SET password = :password_hash WHERE id = :id";
+        $stmt = $pdo->prepare($consulta);
+        $stmt->execute(['password_hash' => $nueva_password_hash, 'id' => $_POST['id']]);
+    }
+
+    // Actualizar los demás campos
+    $consulta = "UPDATE public.user SET nombre = :nombre, apellido = :apellido, correo = :correo, telefono = :telefono, dni = :dni, genero = :genero, direccion = :direccion, fecha_nacimiento = :fecha_nacimiento, rol_id = :rol_id, id_centro = :id_centro, estado = :estado WHERE id = :id";
     $stmt = $pdo->prepare($consulta);
     $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
     $stmt->bindParam(':apellido', $apellido, PDO::PARAM_STR);
@@ -36,15 +61,15 @@ function editar_registro()
     $stmt->bindParam(':genero', $genero, PDO::PARAM_STR);
     $stmt->bindParam(':direccion', $direccion, PDO::PARAM_STR);
     $stmt->bindParam(':fecha_nacimiento', $fecha_nacimiento, PDO::PARAM_STR);
-    $stmt->bindParam(':password', $password, PDO::PARAM_STR);
     $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_STR);
     $stmt->bindParam(':id_centro', $id_centro, PDO::PARAM_STR);
     $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
-    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Asumiendo que el ID es un entero
 
     $stmt->execute();
 
-    header('Location: ../views/user.php');
+    echo "<script>alert('Usuario actualizado exitosamente.');</script>";
+    echo "<script>window.location.href = '../views/user.php';</script>";
 }
 
 function eliminar_registro()
@@ -119,7 +144,7 @@ function acceso_user()
                 header('Location: ../views/analista.php');
             }
         } else {
-            $_SESSION['error_login'] = 'Usuario o contraseña incorrectos';
+            $_SESSION['error_login'] = "<script>alert(''Usuario o contraseña incorrectos'.');</script>";
             header('Location: ../includes/login.php');
         }
     } catch (PDOException $e) {
@@ -143,15 +168,29 @@ function solicitar_recuperacion()
 
             $asunto = "Recuperación de contraseña";
             $mensaje = "Tu contraseña es: " . $password;
-            // Intenta enviar el correo
-            if (mail($correo, $asunto, $mensaje)) {
-                // Éxito: Mostrar alerta de éxito
+
+            // Configuracion del srservidor SMTP
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = '10.121.6.211'; // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
+            $mail->SMTPAuth = true;
+            $mail->Username = 'ecu911\\proyectos'; // Reemplaza con tu correo electrónico
+            $mail->Password = 'R3p0$1+0r103cu9ii'; // Reemplaza con tu contraseña de correo
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // O 'ssl' si es necesario
+            $mail->Port = 25;
+
+            // Configuración del mensaje
+            $mail->setFrom('ecu911.team.proyectos@ecu911.gob.ec', 'SIS ECU 911'); // Reemplaza con tus datos
+            $mail->addAddress($correo);
+            $mail->Subject = $asunto;
+            $mail->Body = $mensaje;
+
+            // Enviar el correo
+            if ($mail->send()) {
                 echo "<script>alert('Correo electrónico enviado con tu contraseña.');</script>";
-                // Redirigir al login u otra página
                 echo "<script>window.location.href = '../includes/login.php';</script>";
             } else {
-                // Error: Mostrar alerta de error
-                echo "<script>alert('Error al enviar el correo electrónico. Por favor, inténtalo de nuevo.');</script>";
+                echo "<script>alert('Error al enviar el correo: {$mail->ErrorInfo}');</script>";
             }
         } else {
             // El correo electrónico no existe

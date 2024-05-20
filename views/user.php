@@ -1,5 +1,4 @@
 <?php
-
 include "../includes/_db.php";
 session_start();
 error_reporting(0);
@@ -164,6 +163,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                 <i class="nav-icon fas fa-table"></i>
                 <p>Indicadores</p>
               </a>
+            </li>
             <li class="nav-item">
               <a href="#" class="nav-link" onclick="loadContent('index.php')">
                 <i class="nav-icon fas fa-edit"></i>
@@ -176,6 +176,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                 <i class="nav-icon far fa-plus-square"></i>
                 <p>Cargar Excel</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>Analisis grafico</p>
               </a>
             </li>
           </ul>
@@ -196,14 +202,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
-      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">
               <div class="card">
-                <!-- /.card-header -->
                 <div class="card-body">
                   <div id="content-container"></div>
                 </div>
@@ -275,6 +279,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
+  <script src="../dist/js/adminlte.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Bootstrap Bundle JS (incluye Popper) -->
 
@@ -297,17 +302,50 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
-
+<script>
+    function initializeChart() {
+      $(function() {
+        // Get context with jQuery - using jQuery's .get() method.
+        var donutChartCanvas = $("#donutChart").get(0).getContext("2d");
+        var donutData = {
+          labels: ["Chrome", "IE", "FireFox", "Safari", "Opera", "Navigator"],
+          datasets: [{
+            data: [700, 500, 400, 600, 300, 100],
+            backgroundColor: [
+              "#f56954",
+              "#00a65a",
+              "#f39c12",
+              "#00c0ef",
+              "#3c8dbc",
+              "#d2d6de",
+            ],
+          }, ],
+        };
+        var donutOptions = {
+          maintainAspectRatio: false,
+          responsive: true,
+        };
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+          type: "doughnut",
+          data: donutData,
+          options: donutOptions,
+        });
+      });
+    }
+  </script>
   <script>
     function loadContent(url) {
       fetch(url)
         .then(response => response.text())
         .then(data => {
           document.getElementById('content-container').innerHTML = data;
+          initializeChart();
         })
         .catch(error => console.error('Error:', error));
     }
   </script>
-  
+
 
 </html>

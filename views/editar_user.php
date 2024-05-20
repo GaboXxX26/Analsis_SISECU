@@ -79,8 +79,13 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control" value="<?php echo $usuario['fecha_nacimiento']; ?>">
                             </div>
                             <div class="form-group">
-                                <label for="password">Contraseña:</label><br>
-                                <input type="password" name="password" id="password" class="form-control" value="<?php echo $usuario['password']; ?>" required>
+                                <label for="nueva_password">Nueva Contraseña:</label>
+                                <input type="password" name="nueva_password" id="nueva_password" class="form-control" >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmar_password">Confirmar Nueva Contraseña:</label>
+                                <input type="password" name="confirmar_password" id="confirmar_password" class="form-control" >
                             </div>
                             <div class="form-group">
                                 <label for="rol_id" class="form-label">Rol:</label>

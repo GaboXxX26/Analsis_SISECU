@@ -6,7 +6,7 @@
                     <label for="excelfile">Archivo Excel</label>
                     <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="excelfile" name="excelfile" required>
+                            <input type="file" class="custom-file-input" id="excelfile" name="excelfile" accept=".xls, .xlsx" required>
                             <label class="custom-file-label" for="excelfile">Elija un archivo</label>
                         </div>
                     </div>

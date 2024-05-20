@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <input type="submit" class="tn btn-primary d-grid w-100s" value="Ingresar">
+                                <input type="submit" class="btn btn-primary d-grid w-100s" value="Ingresar">
                             </div>
                         </form>
                     </div>

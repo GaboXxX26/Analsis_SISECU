@@ -16,7 +16,7 @@ if ($validar == null || $validar == '') {
 <div class="card-header">
   <h3 class="card-title">Tabla de Usuarios registrados en el Sistema</h3>
 </div>
-<table id="example2" class="table table-bordered table-hover table-responsive">
+<table id="example1" class="table table-bordered table-striped "">
   <thead>
     <tr>
       <th>Estado</th>
