@@ -72,6 +72,14 @@ function editar_registro()
     echo "<script>window.location.href = '../views/user.php';</script>";
 }
 
+/**
+ * Function to desactivate a record from the database.
+ *
+ * This function updates the 'estado' column of the 'user' table to 'Inactivo' for the specified ID.
+ * After deleting the record, it redirects the user to the 'user.php' page.
+ *
+ * @return void
+ */
 function eliminar_registro()
 {
     global $pdo;
@@ -176,7 +184,7 @@ function solicitar_recuperacion()
             $mail->SMTPAuth = true;
             $mail->Username = 'ecu911\\proyectos'; // Reemplaza con tu correo electrónico
             $mail->Password = 'R3p0$1+0r103cu9ii'; // Reemplaza con tu contraseña de correo
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // O 'ssl' si es necesario
+            //$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // O 'ssl' si es necesario
             $mail->Port = 25;
 
             // Configuración del mensaje
@@ -195,6 +203,7 @@ function solicitar_recuperacion()
         } else {
             // El correo electrónico no existe
             echo "<script>alert('El correo electrónico no está registrado.');</script>";
+            echo "<script>window.location.href = '../includes/login.php';</script>";
         }
     } catch (PDOException $e) {
         echo "<script>alert('Error al recuperar contraseña: " . $e->getMessage() . "');</script>";

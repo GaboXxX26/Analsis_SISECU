@@ -51,7 +51,7 @@ if ($validar == null || $validar == '') {
         echo '<td>        
               <a class="btn btn-app" href="editar_user.php?id=' . $row['id'] . '" > 
               <i class="fas fa-edit"></i>Editar</a>
-              <a class="btn btn-app" href="eliminar_user.php?id=' . $row['id'] . '">
+              <a class="btn btn-app" href="eliminar_user.php?id=' . $row['id'] . '" >
               <i class="fas fa-trash"></i> Desactivar </a>
             </td>';
         echo "</tr>\n";
@@ -59,13 +59,13 @@ if ($validar == null || $validar == '') {
     } else {
 
     ?>
-      <tr class="text-center">
-        <td colspan="16">No existen registros</td>
-      </tr>
-    <?php
+      <tr class=" text-center">
+  <td colspan="16">No existen registros</td>
+  </tr>
+<?php
     }
-    ?>
-  </tbody>
+?>
+</tbody>
 </table>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

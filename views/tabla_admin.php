@@ -153,14 +153,3 @@ if ($validar == null || $validar == '') {
     ?>
   </tbody>
 </table>
-
-<script>
-  function loadContent(url) {
-    fetch(url)
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('content-container').innerHTML = data;
-      })
-      .catch(error => console.error('Error:', error));
-  }
-</script>

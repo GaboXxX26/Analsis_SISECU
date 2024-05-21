@@ -6,10 +6,10 @@ error_reporting(0);
 $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
+
   header("Location: ../includes/login.php");
   die();
 }
-
 // Verificar si el usuario está activo
 $query = "	SELECT  estado FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
@@ -46,16 +46,15 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
   die();
 }
-
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Administrador</title>
+  <title>Usuario</title>
   <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -92,7 +91,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <div class="preloader flex-column justify-content-center align-items-center">
       <img class="animation__shake" src="../dist/img/ECU911.png" alt="ECU911" height="60" width="60">
     </div>
-
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
       <!-- Left navbar links -->
@@ -108,7 +106,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Notifications Dropdown Menu -->
-
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -124,10 +121,9 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="user.php" class="brand-link">
-        <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image  elevation-3" style="opacity: .8">
+        <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>
-
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
@@ -181,7 +177,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <li class="nav-item">
               <a href="#" class="nav-link " onclick="loadContent('chart.php')">
                 <i class="nav-icon fas fa-chart-pie"></i>
-                <p>Analisis grafico</p>
+                <p>Resultado</p>
               </a>
             </li>
           </ul>
@@ -208,6 +204,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           <div class="row">
             <div class="col-12">
               <div class="card">
+                <!-- /.card-header -->
                 <div class="card-body">
                   <div id="content-container"></div>
                 </div>
@@ -229,7 +226,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     </aside>
     <!-- /.control-sidebar -->
   </div>
-  <!-- ./wrapper -->
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -264,7 +260,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../dist/js/demo.js"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
   <script src="../dist/js/pages/dashboard.js"></script>
-
   <!-- DataTables  & Plugins -->
   <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
   <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -278,11 +273,9 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
   <script src="../dist/js/adminlte.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Bootstrap Bundle JS (incluye Popper) -->
-
+  <!-- Page specific script -->
   <script>
     $(function() {
       $("#example1").DataTable({
@@ -302,7 +295,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
-<script>
+  <script>
     function initializeChart() {
       $(function() {
         // Get context with jQuery - using jQuery's .get() method.
@@ -346,6 +339,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         .catch(error => console.error('Error:', error));
     }
   </script>
-
+</body>
 
 </html>

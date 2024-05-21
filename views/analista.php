@@ -95,7 +95,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="index3.html" class="nav-link">Inicio</a>
+          <a href="#" class="nav-link">Inicio</a>
         </li>
 
       </ul>
@@ -118,7 +118,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="user.php" class="brand-link">
+      <a href="analista.php" class="brand-link">
         <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>
@@ -151,8 +151,14 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               <a href="#" class="nav-link" onclick="loadContent('archivo.php')">
                 <i class="nav-icon fas fa-table"></i>
                 <p>
-                  Indicadores
+                  Subir Excel
                 </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>Resultado</p>
               </a>
             </li>
           </ul>
