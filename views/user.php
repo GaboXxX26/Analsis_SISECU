@@ -23,7 +23,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   header("Location: ../views/acceso_denegado.php");
   die();
 }
-
 $query = "SELECT rol_id FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':correo', $validar);
@@ -49,12 +48,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Usuario</title>
+  <title>Administrador</title>
   <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -80,9 +79,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <!-- Para el formulairo de registro -->
-  <link rel="stylesheet" href="./css/es.css">
-  <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -91,6 +87,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <div class="preloader flex-column justify-content-center align-items-center">
       <img class="animation__shake" src="../dist/img/ECU911.png" alt="ECU911" height="60" width="60">
     </div>
+
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
       <!-- Left navbar links -->
@@ -106,6 +103,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Notifications Dropdown Menu -->
+
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -117,13 +115,15 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
     </nav>
     <!-- /.navbar -->
+
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="user.php" class="brand-link">
+      <a href="lector.php" class="brand-link">
         <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>
+
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
@@ -132,7 +132,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <img src="../dist/img/User.png" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Administrador</a>
+            <a href="#" class="d-block">Administrdor</a>
           </div>
         </div>
         <!-- Sidebar Menu -->
@@ -140,14 +140,13 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-            <li class="nav-item">
-              <a href="user.php" class="nav-link ">
-                <i class="nav-icon fas fa-home"></i>
+            <li class="nav-item menu-open">
+              <a href="analista.php" class="nav-link ">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
                 </p>
               </a>
-            </li>
             <li class="nav-item">
               <a href="#" class="nav-link " onclick="loadContent('admin.php')">
                 <i class="nav-icon far fa-user"></i>
@@ -186,6 +185,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
       <!-- /.sidebar -->
     </aside>
+
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -198,6 +198,8 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
+
+      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -226,6 +228,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     </aside>
     <!-- /.control-sidebar -->
   </div>
+  <!-- ./wrapper -->
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -273,8 +276,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-  <script src="../dist/js/adminlte.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Page specific script -->
   <script>
     $(function() {
@@ -297,48 +298,60 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   </script>
   <script>
     function initializeChart() {
-      $(function() {
-        // Get context with jQuery - using jQuery's .get() method.
-        var donutChartCanvas = $("#donutChart").get(0).getContext("2d");
-        var donutData = {
-          labels: ["Chrome", "IE", "FireFox", "Safari", "Opera", "Navigator"],
-          datasets: [{
-            data: [700, 500, 400, 600, 300, 100],
-            backgroundColor: [
-              "#f56954",
-              "#00a65a",
-              "#f39c12",
-              "#00c0ef",
-              "#3c8dbc",
-              "#d2d6de",
-            ],
-          }, ],
-        };
-        var donutOptions = {
-          maintainAspectRatio: false,
-          responsive: true,
-        };
-        //Create pie or douhnut chart
-        // You can switch between pie and douhnut using the method below.
-        new Chart(donutChartCanvas, {
-          type: "doughnut",
-          data: donutData,
-          options: donutOptions,
+      $(document).ready(function() {
+        var centros = [];
+        var datos = [];
+        var colores = []; // Array para almacenar los colores de fondo
+
+        $("#example2 tbody tr").each(function() {
+          centros.push($(this).find("td:first-child").text());
+          datos.push(parseFloat($(this).find("td:last-child").text())); // Obtener el valor numérico del total
+
+          // Obtener el color de fondo de la celda del total
+          var colorFondo = $(this).find("td:last-child").css("background-color");
+          colores.push(colorFondo);
+        });
+
+        var ctx = document.getElementById('myDoughnutChart').getContext('2d');
+        var myDoughnutChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: centros,
+            datasets: [{
+              data: datos,
+              backgroundColor: colores, // Usar los colores extraídos de la tabla
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    var label = context.label || '';
+                    var value = context.formattedValue || 0;
+                    return label + ': ' + value + '%'; // Mostrar el porcentaje en el tooltip
+                  }
+                }
+              }
+            }
+          }
         });
       });
     }
   </script>
+  <!-- cargar pagina sin neceidad de cargar rutas  -->
   <script>
     function loadContent(url) {
       fetch(url)
         .then(response => response.text())
         .then(data => {
           document.getElementById('content-container').innerHTML = data;
-          initializeChart();
         })
         .catch(error => console.error('Error:', error));
     }
   </script>
+
 </body>
 
 </html>

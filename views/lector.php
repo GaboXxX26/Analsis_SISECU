@@ -23,7 +23,6 @@ if (!$usuario || $usuario['estado'] != 'Activo') {
   header("Location: ../views/acceso_denegado.php");
   die();
 }
-
 $query = "SELECT rol_id FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':correo', $validar);
@@ -34,22 +33,22 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php','tabla_admin.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'=>['analista.php']
 
 ];
 
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-  die();
+    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+    die();
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -80,12 +79,14 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Preloader -->
     <div class="preloader flex-column justify-content-center align-items-center">
       <img class="animation__shake" src="../dist/img/ECU911.png" alt="ECU911" height="60" width="60">
     </div>
+
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
       <!-- Left navbar links -->
@@ -101,6 +102,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         <!-- Notifications Dropdown Menu -->
+
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -112,13 +114,15 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
     </nav>
     <!-- /.navbar -->
+
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="lector/php" class="brand-link">
+      <a href="lector.php" class="brand-link">
         <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>
+
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
@@ -136,14 +140,13 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
-              <a href="lector.php" class="nav-link ">
+              <a href="analista.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
                 </p>
               </a>
-            </li>
-            <li class="nav-item">
+              <li class="nav-item">
               <a href="#" class="nav-link " onclick="loadContent('usurio.php')">
                 <i class="nav-icon far fa-user"></i>
                 <p>Usuarios</p>
@@ -175,6 +178,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
       <!-- /.sidebar -->
     </aside>
+
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -187,6 +191,8 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
+
+      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -215,6 +221,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     </aside>
     <!-- /.control-sidebar -->
   </div>
+  <!-- ./wrapper -->
   <!-- jQuery -->
   <script src="../plugins/jquery/jquery.min.js"></script>
   <!-- jQuery UI 1.11.4 -->
@@ -262,8 +269,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-  <script src="../dist/js/adminlte.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Page specific script -->
   <script>
     $(function() {
@@ -284,6 +289,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
+  <!-- cargar pagina sin neceidad de cargar rutas  -->
   <script>
     function loadContent(url) {
       fetch(url)
@@ -294,6 +300,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         .catch(error => console.error('Error:', error));
     }
   </script>
+
 </body>
 
 </html>

@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include "_db.php";
+session_start();
 
 if (isset($_POST['registrar_centro'])) {
     $num_centros = 16; // Número total de centros
@@ -35,8 +36,24 @@ if (isset($_POST['registrar_centro'])) {
             'com_estra' => $com_estra
         ]);
     }
+    // Redirección basada en roles
+    $rol_id = $_SESSION['rol_id']; // Obtener el rol del usuario de la sesión
 
-    header('Location: ../views/user.php');
+    // Definir páginas de redirección por rol (puedes ajustar esto según tus necesidades)
+    $paginas_redireccion = [
+        'add38db6-1687-4e57-a763-a959400d9da2' => 'user.php',  // Rol de administrador
+        'e17a74c4-9627-443c-b020-23dc4818b718' => 'lector.php',   // Rol de lector
+        'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => 'analista.php' // Rol de analista
+    ];
+
+    // Verificar si el rol del usuario está definido en el arreglo y redireccionar
+    if (array_key_exists($rol_id, $paginas_redireccion)) {
+        header('Location: ../views/' . $paginas_redireccion[$rol_id]);
+        exit; // Importante: detener la ejecución del script después de la redirección
+    } else {
+        // Redirigir a una página de error si el rol no está definido
+        header('Location: ../views/error.php'); 
+        exit; // Detener la ejecución
+    }
+
 }
-
-

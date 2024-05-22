@@ -13,7 +13,7 @@
 
                             </div>
                             <div class="card-body">
-                                <canvas id="donutChart" style="
+                                <canvas id="myDoughnutChart" style="
                         min-height: 250px;
                         height: 250px;
                         max-height: 250px;
