@@ -2,7 +2,6 @@
 include "_db.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
 
@@ -33,21 +32,25 @@ function editar_registro()
     extract($_POST);
 
     // Verificar si se proporcionaron nuevas contraseñas
-    if (!empty($_POST['nueva_password']) && !empty($_POST['confirmar_password'])) {
+    $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#"; // Reemplaza con una clave realmente segura
 
+    // Verificar si se proporcionaron nuevas contraseñas
+    if (!empty($_POST['nueva_password']) && !empty($_POST['confirmar_password'])) {
         // Validar que las nuevas contraseñas coincidan
         if ($_POST['nueva_password'] !== $_POST['confirmar_password']) {
             echo "<script>alert('Las nuevas contraseñas no coinciden.');</script>";
             return; // Salir de la función si no coinciden
         }
 
-        // Hashear la nueva contraseña
-        $nueva_password_hash = password_hash($_POST['nueva_password'], PASSWORD_BCRYPT);
+        // Encriptar la nueva contraseña con AES-256-CBC
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $encryptedPassword = openssl_encrypt($_POST['nueva_password'], 'aes-256-cbc', $key, 0, $iv);
+        $encryptedPassword = base64_encode($encryptedPassword . '::' . $iv); // Combinar contraseña y IV
 
-        // Actualizar la contraseña en la base de datos
-        $consulta = "UPDATE public.user SET password = :password_hash WHERE id = :id";
-        $stmt = $pdo->prepare($consulta);
-        $stmt->execute(['password_hash' => $nueva_password_hash, 'id' => $_POST['id']]);
+        // Actualizar la contraseña en la base de datos (usando el valor encriptado)
+        $consultaPassword = "UPDATE public.user SET password = :encryptedPassword WHERE id = :id";
+        $stmtPassword = $pdo->prepare($consultaPassword);
+        $stmtPassword->execute(['encryptedPassword' => $encryptedPassword, 'id' => $_POST['id']]);
     }
 
     // Actualizar los demás campos
@@ -131,32 +134,47 @@ function acceso_user()
     $password_ingresada = $_POST['password'];  // Cambiamos el nombre de la variable
     session_start();
 
+    $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";
+    // Reemplaza con una clave realmente segura
     try {
-        // Consulta para obtener el hash de la contraseña
-        $consulta = "SELECT * FROM public.user WHERE correo = :correo";
+        // Consulta para obtener el hash de la contraseña y el IV
+        $consulta = "SELECT password, rol_id FROM public.user WHERE correo = :correo"; // Obtener también el rol_id
         $stmt = $pdo->prepare($consulta);
         $stmt->bindParam(':correo', $correo, PDO::PARAM_STR);
         $stmt->execute();
-        $filas = $stmt->fetch(PDO::FETCH_ASSOC);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Verificar si el correo existe y si la contraseña es correcta
-        if ($filas && password_verify($password_ingresada, $filas['password'])) {
-            $_SESSION['correo'] = $correo; // Ahora es seguro almacenar el correo
+        // Verificar si el correo existe
+        if ($fila) {
+            // Obtener la contraseña encriptada y el IV
+            list($encryptedPassword, $iv) = explode('::', base64_decode($fila['password']), 2);
 
-            // Redireccionar según el rol
-            if ($filas['rol_id'] == 'add38db6-1687-4e57-a763-a959400d9da2') { // Admin
-                header('Location: ../views/user.php');
-            } elseif ($filas['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718') { // Usuario
-                header('Location: ../views/lector.php');
-            } elseif ($filas['rol_id'] == 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6') { // Analista de Datos
-                header('Location: ../views/analista.php');
+            // Desencriptar la contraseña
+            $decryptedPassword = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv);
+
+            // Verificar si la contraseña es correcta
+            if ($decryptedPassword === $password_ingresada) {
+                $_SESSION['correo'] = $correo;
+
+                // Redireccionar según el rol_id (manteniendo la estructura original)
+                if ($fila['rol_id'] == 'add38db6-1687-4e57-a763-a959400d9da2') { // Admin
+                    header('Location: ../views/user.php');
+                } elseif ($fila['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718') { // Usuario
+                    header('Location: ../views/lector.php');
+                } elseif ($fila['rol_id'] == 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6') { // Analista de Datos
+                    header('Location: ../views/analista.php');
+                }
+            } else {
+                $_SESSION['error_login'] = "Usuario o contraseña incorrectos.";
+                header('Location: ../includes/login.php');
             }
         } else {
-            $_SESSION['error_login'] = "<script>alert(''Usuario o contraseña incorrectos'.');</script>";
+            $_SESSION['error_login'] = "Usuario o contraseña incorrectos.";
             header('Location: ../includes/login.php');
         }
     } catch (PDOException $e) {
         echo "Error en el inicio de sesión: " . $e->getMessage();
+        // Es buena práctica registrar el error en un log para depuración
     }
 }
 
@@ -172,19 +190,25 @@ function solicitar_recuperacion()
         $usuario = $stmt->fetch();
 
         if ($usuario) {
-            $password = password_hash($usuario['password'], PASSWORD_DEFAULT); //decencriptar la clave, NORMA POCO SEGURA
 
-            $asunto = "Recuperación de contraseña";
-            $mensaje = "Tu contraseña es: " . $password;
+            $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";
+
+            list($encryptedPassword, $iv) = explode('::', base64_decode($usuario['password']), 2); // Desencriptar la contraseña
+            $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv); //decencriptar la clave, NORMA POCO SEGURA
+
+            $asunto = "Recuperacion de clave del Cuadro de Mando y Gestion";
+            $mensaje = "Tu clave es: " . $password;
 
             // Configuracion del srservidor SMTP
-            $mail = new PHPMailer(true);
+            $mail = new PHPMailer(false);
             $mail->isSMTP();
-            $mail->Host = '10.121.6.211'; // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
-            $mail->SMTPAuth = true;
-            $mail->Username = 'ecu911\\proyectos'; // Reemplaza con tu correo electrónico
-            $mail->Password = 'R3p0$1+0r103cu9ii'; // Reemplaza con tu contraseña de correo
-            //$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // O 'ssl' si es necesario
+            $mail->SMTPDebug = 2;
+            $mail->Host = 'MAIL02ECU911.ecu911.int';  // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
+            $mail->SMTPAuth = false;
+            $mail->Username = 'ecu911\proyectos'; // Reemplaza con tu correo electrónico
+            $mail->Password = 'R3p0$1+0r103cu9ii';
+            $mail->SMTPAutoTLS = false; // Reemplaza con tu contraseña de correo
+            $mail->SMTPSecure = false;  // O 'ssl' si es necesario
             $mail->Port = 25;
 
             // Configuración del mensaje
