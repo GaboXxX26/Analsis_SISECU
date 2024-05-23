@@ -22,10 +22,10 @@
         <h2 class="headline text-warning"> 404</h2>
 
         <div class="error-content">
-          <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found.</h3>
+          <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Pagina no encontrada.</h3>
           <p>
-            We could not find the page you were looking for.
-            Meanwhile, you may <a href="../includes/login.php">return to dashboard</a> or try using the search form.
+            No pudimos encontrar la pagina solicitada acceso restringido.
+            Puedes <a href="../includes/login.php">Regresar al login</a> o busque ayuda con el servicio
           </p>
         </div>
         <!-- /.error-content -->

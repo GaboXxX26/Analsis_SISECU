@@ -31,10 +31,14 @@ if (isset($_POST['registrar'])) {
         $id_centro = trim($_POST['id_centro']);
         $estado = trim($_POST['estado']);
 
-        $password_hash = password_hash($password, PASSWORD_BCRYPT);
+        // Encriptar la contraseña con AES-256-CBC
+        $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";// ¡Cambia esto por una clave realmente segura!
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $encryptedPassword = openssl_encrypt($password, 'aes-256-cbc', $key, 0, $iv);
+        $encryptedPassword = base64_encode($encryptedPassword . '::' . $iv); // Combinar contraseña y IV
 
         $consulta = "INSERT INTO public.user (id, nombre, apellido, correo, telefono, dni, genero, direccion, fecha_nacimiento, password, rol_id, id_centro, estado) 
-        VALUES (uuid_generate_v4(), :nombre, :apellido, :correo, :telefono, :dni, :genero, :direccion, :fecha_nacimiento, :password_hash,:rol_id, :id_centro, :estado)";
+        VALUES (uuid_generate_v4(), :nombre, :apellido, :correo, :telefono, :dni, :genero, :direccion, :fecha_nacimiento, :encryptedPassword,:rol_id, :id_centro, :estado)";
 
 
         $stmt = $pdo->prepare($consulta);
@@ -47,7 +51,7 @@ if (isset($_POST['registrar'])) {
             'genero' => $genero,
             'direccion' => $direccion,
             'fecha_nacimiento' => $fecha_nacimiento,
-            'password_hash' => $password_hash,
+            'encryptedPassword' => $encryptedPassword,
             'rol_id' => $rol_id,
             'id_centro' => $id_centro,
             'estado' => $estado
