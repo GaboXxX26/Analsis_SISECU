@@ -153,7 +153,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('tabla_admin.php')">
+              <a href="tabla_user.php" class="nav-link" >
                 <i class="nav-icon fas fa-table"></i>
                 <p>
                   Indicadores

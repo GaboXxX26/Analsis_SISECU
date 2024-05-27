@@ -141,7 +141,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
-              <a href="analista.php" class="nav-link ">
+              <a href="#" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
@@ -154,7 +154,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('tabla_admin.php')">
+              <a href="tabla_admin.php" class="nav-link" >
                 <i class="nav-icon fas fa-table"></i>
                 <p>Indicadores</p>
               </a>
@@ -296,51 +296,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
-  <script>
-    function initializeChart() {
-      $(document).ready(function() {
-        var centros = [];
-        var datos = [];
-        var colores = []; // Array para almacenar los colores de fondo
-
-        $("#example2 tbody tr").each(function() {
-          centros.push($(this).find("td:first-child").text());
-          datos.push(parseFloat($(this).find("td:last-child").text())); // Obtener el valor numérico del total
-
-          // Obtener el color de fondo de la celda del total
-          var colorFondo = $(this).find("td:last-child").css("background-color");
-          colores.push(colorFondo);
-        });
-
-        var ctx = document.getElementById('myDoughnutChart').getContext('2d');
-        var myDoughnutChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: centros,
-            datasets: [{
-              data: datos,
-              backgroundColor: colores, // Usar los colores extraídos de la tabla
-              hoverOffset: 4
-            }]
-          },
-          options: {
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    var label = context.label || '';
-                    var value = context.formattedValue || 0;
-                    return label + ': ' + value + '%'; // Mostrar el porcentaje en el tooltip
-                  }
-                }
-              }
-            }
-          }
-        });
-      });
-    }
-  </script>
-  <!-- cargar pagina sin neceidad de cargar rutas  -->
+  
   <script>
     function loadContent(url) {
       fetch(url)

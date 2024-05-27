@@ -202,12 +202,11 @@ function solicitar_recuperacion()
             // Configuracion del srservidor SMTP
             $mail = new PHPMailer(false);
             $mail->isSMTP();
-            $mail->SMTPDebug = 2;
             $mail->Host = 'MAIL02ECU911.ecu911.int';  // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
             $mail->SMTPAuth = false;
-            $mail->Username = 'ecu911\proyectos'; // Reemplaza con tu correo electrónico
+            $mail->Username = 'ecu911\proyectos'; 
             $mail->Password = 'R3p0$1+0r103cu9ii';
-            $mail->SMTPAutoTLS = false; // Reemplaza con tu contraseña de correo
+            $mail->SMTPAutoTLS = false; 
             $mail->SMTPSecure = false;  // O 'ssl' si es necesario
             $mail->Port = 25;
 
