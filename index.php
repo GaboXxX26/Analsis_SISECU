@@ -34,7 +34,7 @@
                         <span class="red-first-letter">M</span>ando y
                         <span class="red-first-letter">G</span>estión
                     </h2>
-                    <h2 class="custom-heading text-gray text-center">INICIAR SESION</h2>
+                    <h2 class="custom-heading text-gray text-center">INICIAR SESION </h2>
                     <div class="card-body">
                         <form id="formAuthentication" class="mb-3" action="./includes/_functions.php" method="POST">
                             <div class="mb-3">
