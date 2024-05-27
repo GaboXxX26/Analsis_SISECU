@@ -119,7 +119,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="lector.php" class="brand-link">
+      <a href="user.php" class="brand-link">
         <img src="../dist/img/ECU911.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">SIS ECU 911</span>
       </a>

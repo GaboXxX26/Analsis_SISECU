@@ -16,61 +16,26 @@ if ($validar == null || $validar == '') {
   <h3 class="card-title">Tabla de Indicadores SIS ECU911</h3>
 </div>
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <label class="btn  btn-outline-danger btn-sm ">
-    <input type="radio" name="options" id="option1" onclick="loadContent('../views/tabla_admin.php')"> Todos
-  </label>
-  <label class="btn  btn-outline-danger btn-sm ">
-    <input type="radio" name="options" id="option1" onclick="loadContent('../centros/ambato.php')"> Ambato
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option2" onclick="loadContent('../centros/babhoyo.php')"> Babahoyo
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/cuenca.php')"> Cuenca
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/Esmeraldas.php')"> Esmeraldas
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/ibarra.php')"> Ibarra
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/loja.php')"> Loja
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/macas.php')"> Macas
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/machala.php')"> Machala
-  </label>
-</div>
-<br>
-<div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <br>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/nuva.php')"> Nueva Loja
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/porto.php')"> Portoviejo
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/quito.php')"> Quito
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/rio.php')"> Riobamba
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/sambo.php')"> Samborondón
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/san.php')"> San Cristóbal
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/santo.php')"> Santo Domingo
-  </label>
-  <label class="btn  btn-outline-danger btn-sm">
-    <input type="radio" name="options" id="option3" onclick="loadContent('../centros/tulcan.php')"> Tulcán
-  </label>
+  <label for=""> Selecione el centro para ver los registros</label>
+  <select aria-label=".form-select-sm example" class="form-control select2" style="width: 100%;" onchange="loadContent(this.value)">
+    <option value="../views/tabla_admin.php">Todos</option>
+    <option value="../centros/ambato.php">Ambato</option>
+    <option value="../centros/babhoyo.php">Babahoyo</option>
+    <option value="../centros/cuenca.php">Cuenca</option>
+    <option value="../centros/esmeraldas.php">Esmeraldas</option>
+    <option value="../centros/ibarra.php">Ibarra</option>
+    <option value="../centros/loja.php">Loja</option>
+    <option value="../centros/macas.php">Macas</option>
+    <option value="../centros/machala.php">Machala</option>
+    <option value="../centros/nueva.php" selected>Nueva Loja</option>
+    <option value="../centros/porto.php">Portoviejo</option>
+    <option value="../centros/quito.php">Quito</option>
+    <option value="../centros/rio.php">Riobamba</option>
+    <option value="../centros/sambo.php">Samborondón</option>
+    <option value="../centros/san.php">San Cristóbal</option>
+    <option value="../centros/santo.php">Santo Domingo</option>
+    <option value="../centros/tulcan.php">Tulcán</option>
+  </select>
 </div>
 <table id="example2" class="table table-bordered table-hover table-responsive">
   <thead>
