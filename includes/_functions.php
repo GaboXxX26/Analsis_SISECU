@@ -23,6 +23,9 @@ if (isset($_POST['accion'])) {
         case 'solicitar_recuperacion';
             solicitar_recuperacion();
             break;
+        case 'parametros';
+            parametros();
+            break;
     }
 }
 
@@ -204,9 +207,9 @@ function solicitar_recuperacion()
             $mail->isSMTP();
             $mail->Host = 'MAIL02ECU911.ecu911.int';  // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
             $mail->SMTPAuth = false;
-            $mail->Username = 'ecu911\proyectos'; 
+            $mail->Username = 'ecu911\proyectos';
             $mail->Password = 'R3p0$1+0r103cu9ii';
-            $mail->SMTPAutoTLS = false; 
+            $mail->SMTPAutoTLS = false;
             $mail->SMTPSecure = false;  // O 'ssl' si es necesario
             $mail->Port = 25;
 
@@ -232,3 +235,49 @@ function solicitar_recuperacion()
         echo "<script>alert('Error al recuperar contraseña: " . $e->getMessage() . "');</script>";
     }
 }
+
+function parametros() {
+    global $pdo;
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['parametros'])) {
+        // Array para almacenar los datos validados
+        $parametrosValidos = [];
+
+        // Iteramos sobre los posibles parámetros (1 a 4)
+        for ($i = 1; $i <= 4; $i++) {
+            $parametro = filter_input(INPUT_POST, 'parametro_' . $i, FILTER_VALIDATE_INT);
+            $color = filter_input(INPUT_POST, 'color_' . $i, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $nombre = filter_input(INPUT_POST, 'nombre_' . $i, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+            // Si todos los campos son válidos, los agregamos al array
+            if ($parametro !== false && !empty($color) && !empty($nombre)) {
+                $parametrosValidos[] = [
+                    'parametro' => $parametro,
+                    'color' => $color,
+                    'nombre' => $nombre
+                ];
+            }
+        }
+
+        // Si hay parámetros válidos, los insertamos en la base de datos
+        if (!empty($parametrosValidos)) {
+            try {
+                $pdo->beginTransaction(); // Iniciamos una transacción
+
+                $stmt = $pdo->prepare("INSERT INTO public.parametros (parametro, color, nombre) VALUES (:parametro, :color, :nombre)");
+
+                foreach ($parametrosValidos as $param) {
+                    $stmt->execute($param);
+                }
+
+                $pdo->commit(); // Confirmamos la transacción
+
+            } catch (PDOException $e) {
+                $pdo->rollBack(); // Revertimos la transacción en caso de error
+                error_log("Error en la inserción de datos: " . $e->getMessage());
+                // Manejo de errores (mostrar mensaje, redirigir, etc.)
+            }
+        }
+    }
+}
+

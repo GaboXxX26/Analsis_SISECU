@@ -138,8 +138,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+            <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
               <a href="#" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -154,7 +153,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               </a>
             </li>
             <li class="nav-item">
-              <a href="tabla_admin.php" class="nav-link" >
+              <a href="tabla_admin.php" class="nav-link">
                 <i class="nav-icon fas fa-table"></i>
                 <p>Indicadores</p>
               </a>
@@ -179,13 +178,18 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
                 <p>Resultado</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
+                <i class="nav-icon fas fa-table"></i>
+                <p>Parametrizacion</p>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
       </div>
       <!-- /.sidebar -->
     </aside>
-
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -198,7 +202,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
-
       <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
@@ -296,7 +299,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       });
     });
   </script>
-  
+
   <script>
     function loadContent(url) {
       fetch(url)
@@ -306,6 +309,15 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         })
         .catch(error => console.error('Error:', error));
     }
+
+    window.addEventListener('load', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+
+      if (section === 'parametro') {
+        loadContent('parametro.php'); 
+      }
+    });
   </script>
 
 </body>

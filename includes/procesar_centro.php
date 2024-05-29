@@ -11,7 +11,7 @@ if (isset($_POST['registrar_centro'])) {
 
     // Preparar la consulta para insertar los datos de los centros
     $consulta = "INSERT INTO public.registros(id_registro, id_centro, conve_stra, comp_insti, opera_cam, ausentimo, mobile_locator, dispoci, com_estra)
-                 VALUES (uuid_generate_v4(), :id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra)";
+                VALUES (uuid_generate_v4(), :id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra)";
 
     $stmt = $pdo->prepare($consulta);
 

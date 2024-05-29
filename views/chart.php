@@ -18,7 +18,7 @@
                         height: 250px;
                         max-height: 250px;
                         max-width: 100%;
-                      "></canvas>
+"></canvas>
                             </div>
 
                         </div>
@@ -64,42 +64,52 @@ $stmt = $pdo->query($consulta);
     </thead>
     <tbody>
         <?php
+        require_once '../includes/_db.php';
+
+        // Obtener los parámetros ordenados por valor descendente
+        $consulta_parametros = "SELECT parametro, color FROM public.parametros ORDER BY parametro DESC";
+        $stmt_parametros = $pdo->query($consulta_parametros);
+        $parametros = $stmt_parametros->fetchAll(PDO::FETCH_ASSOC);
 
         if ($stmt->rowCount() > 0) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
                 echo "<td>" . $row['nombre_centro'] . "</td>";
 
-                // Calcular los promedios dividiendo las sumas por el número de repeticiones:
+                // Calcular los promedios sin multiplicar por los porcentajes
                 $promedio_gestion = ($row['suma_conve_stra'] + $row['suma_comp_insti']) / $row['num_repeticiones'];
                 $promedio_operativa = ($row['suma_opera_cam'] + $row['suma_ausentimo'] + $row['suma_mobile_locator']) / $row['num_repeticiones'];
                 $promedio_calidad = ($row['suma_dispoci'] + $row['suma_com_estra']) / $row['num_repeticiones'];
 
-                // Formatear los promedios a dos decimales (opcional):
                 $promedio_gestion_formatted = number_format($promedio_gestion, 2);
                 $promedio_operativa_formatted = number_format($promedio_operativa, 2);
                 $promedio_calidad_formatted = number_format($promedio_calidad, 2);
 
-                // Mostrar los promedios formateados:
                 echo "<td>" . $promedio_gestion_formatted . "</td>";
                 echo "<td>" . $promedio_operativa_formatted . "</td>";
                 echo "<td>" . $promedio_calidad_formatted . "</td>";
 
-                // Suma total de los promedios:
+                // Calcular la suma total del centro
                 $suma_total_centro = $promedio_gestion + $promedio_operativa + $promedio_calidad;
 
                 // Aplicar color de fondo según el valor del total
                 $color_fondo = '';
-                if ($suma_total_centro >= 70) {
-                    $color_fondo = 'bg-success'; // Verde
-                } elseif ($suma_total_centro >= 50) {
-                    $color_fondo = 'bg-warning'; // Amarillo
-                } else {
-                    $color_fondo = 'bg-danger'; // Rojo
+                foreach ($parametros as $index => $parametro) {
+                    if ($index == 0 && $suma_total_centro >= $parametro['parametro']) {
+                        $color_fondo = $parametro['color'];
+                        break;
+                    } elseif (isset($parametros[$index + 1])) {
+                        if ($suma_total_centro < $parametro['parametro'] && $suma_total_centro >= $parametros[$index + 1]['parametro']) {
+                            $color_fondo = $parametros[$index + 1]['color'];
+                            break;
+                        }
+                    } elseif ($index == count($parametros) - 1 && $suma_total_centro < $parametro['parametro']) {
+                        $color_fondo = $parametro['color'];
+                        break;
+                    }
                 }
 
-                echo "<td class='" . $color_fondo . "'>" . number_format($suma_total_centro, 2) . "</td>";
-
+                echo "<td style='background-color: " . $color_fondo . "'>" . number_format($suma_total_centro, 2) . "</td>";
                 echo "</tr>\n";
             }
         } else {
