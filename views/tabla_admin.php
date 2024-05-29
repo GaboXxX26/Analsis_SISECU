@@ -3,70 +3,44 @@ include "../includes/_db.php";
 session_start();
 error_reporting(0);
 
-$validar = $_SESSION['correo'];
-
-if ($validar == null || $validar == '') {
-
-  header("Location: ../includes/login.php");
-  die();
-}
-// Verificar si el usuario está activo
-$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$usuario || $usuario['estado'] != 'Activo') {
-  // El usuario no existe o no está activo
-  // Redirigir a una página de error o mostrar un mensaje
-  header("Location: ../views/acceso_denegado.php");
-  die();
-}
-$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$_SESSION['rol_id'] = $usuario['rol_id'];
-
-// Definir permisos por rol
-$permisos = [
-  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
-
-];
-
-// Verificar si el usuario tiene permiso para la página actual
-$pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
-if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-  die();
-}
-
-
-// Obtener el mes, año y centro seleccionados
+// Obtener el mes, año, trimestre, rango de fechas y centro seleccionados
 $selectedMonth = isset($_GET['month']) ? $_GET['month'] : '';
 $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
-$selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : 'ef48298f-cedf-4718-aa67-b097c80ef23b'; // Centro predeterminado
+$selectedTrimestre = isset($_GET['trimestre']) ? $_GET['trimestre'] : '';
+$selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : 'ef48298f-cedf-4718-aa67-b097c80ef23b';
+$selectedRango = isset($_GET['filterType']) && $_GET['filterType'] == 'rango';
+$fechaInicio = $selectedRango && isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
+$fechaFin = $selectedRango && isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
 
 // Construir la consulta SQL con condiciones opcionales
-$consulta = "SELECT c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra 
-             FROM public.registros AS r 
-             LEFT JOIN centro AS c ON c.id_centro = r.id_centro
-             WHERE EXTRACT(YEAR FROM r.created_at) = :selectedYear
-             AND r.id_centro = :selectedCentro";
-
+$consulta = "SELECT c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra, TO_CHAR(r.created_at, 'TMMonth') AS mes_creado
+                FROM public.registros AS r 
+                LEFT JOIN centro AS c ON c.id_centro = r.id_centro
+                WHERE r.id_centro = :selectedCentro";
 $params = [
-  'selectedYear' => $selectedYear,
   'selectedCentro' => $selectedCentro
 ];
 
-if ($selectedMonth != '') {
-  $consulta .= " AND EXTRACT(MONTH FROM r.created_at) = :selectedMonth";
-  $params['selectedMonth'] = $selectedMonth;
+// Agregar filtros según el tipo seleccionado
+if (!empty($_GET['filterType'])) {
+  if ($_GET['filterType'] == 'mensual' && $selectedMonth != '') {
+    $consulta .= " AND EXTRACT(MONTH FROM r.created_at) = :selectedMonth AND EXTRACT(YEAR FROM r.created_at) = :selectedYear";
+    $params['selectedMonth'] = $selectedMonth;
+    $params['selectedYear'] = $selectedYear;
+  } elseif ($_GET['filterType'] == 'trimestral' && $selectedTrimestre != '') {
+    $consulta .= " AND EXTRACT(QUARTER FROM r.created_at) = :selectedTrimestre AND EXTRACT(YEAR FROM r.created_at) = :selectedYear";
+    $params['selectedTrimestre'] = $selectedTrimestre;
+    $params['selectedYear'] = $selectedYear;
+  } elseif ($_GET['filterType'] == 'rango' && !empty($fechaInicio) && !empty($fechaFin)) {
+    // Convertir las fechas a timestamp with time zone
+    $fechaInicio .= ' 00:00:00'; // Agregar hora, minuto y segundo de inicio del día
+    $fechaFin .= ' 23:59:59';   // Agregar hora, minuto y segundo de fin del día
+    $consulta .= " AND r.created_at BETWEEN :fechaInicio AND :fechaFin";
+    $params['fechaInicio'] = $fechaInicio;
+    $params['fechaFin'] = $fechaFin;
+  }
+} else {
+  $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = EXTRACT(YEAR FROM CURRENT_TIMESTAMP)"; // Usar CURRENT_TIMESTAMP
 }
 
 $consulta .= " ORDER BY c.nombre_centro";
@@ -166,8 +140,7 @@ $stmt->execute($params);
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+            <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
               <a href="#" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -241,7 +214,7 @@ $stmt->execute($params);
                   </div>
                   <br>
                   <div class="container mt-5">
-                    <h2 class="mb-4">Filtrar Registros por Mes, Año y Centro</h2>
+                    <h2 class="mb-4">Filtrar Registros por Mes, Año, Trimestre y Centro</h2>
                     <form id="filterForm" class="mb-4" method="GET">
                       <div class="form-group">
                         <label for="centroSelect">Seleccione un centro:</label>
@@ -264,54 +237,37 @@ $stmt->execute($params);
                         </select>
                       </div>
                       <div class="form-group">
-                        <label for="monthSelect">Seleccione un mes:</label>
-                        <select id="monthSelect" name="month" class="form-control">
-                          <option value="" selected>Seleccione un mes</option>
-                          <option value="01" <?= $selectedMonth == '01' ? 'selected' : '' ?>>Enero</option>
-                          <option value="02" <?= $selectedMonth == '02' ? 'selected' : '' ?>>Febrero</option>
-                          <option value="03" <?= $selectedMonth == '03' ? 'selected' : '' ?>>Marzo</option>
-                          <option value="04" <?= $selectedMonth == '04' ? 'selected' : '' ?>>Abril</option>
-                          <option value="05" <?= $selectedMonth == '05' ? 'selected' : '' ?>>Mayo</option>
-                          <option value="06" <?= $selectedMonth == '06' ? 'selected' : '' ?>>Junio</option>
-                          <option value="07" <?= $selectedMonth == '07' ? 'selected' : '' ?>>Julio</option>
-                          <option value="08" <?= $selectedMonth == '08' ? 'selected' : '' ?>>Agosto</option>
-                          <option value="09" <?= $selectedMonth == '09' ? 'selected' : '' ?>>Septiembre</option>
-                          <option value="10" <?= $selectedMonth == '10' ? 'selected' : '' ?>>Octubre</option>
-                          <option value="11" <?= $selectedMonth == '11' ? 'selected' : '' ?>>Noviembre</option>
-                          <option value="12" <?= $selectedMonth == '12' ? 'selected' : '' ?>>Diciembre</option>
+                        <label for="filterTypeSelect">Seleccione tipo de filtro:</label>
+                        <select id="filterTypeSelect" name="filterType" class="form-control">
+                          <option value="">Seleccione un filtro</option>
+                          <option value="mensual" <?php if (empty($_GET['filterType']) || $_GET['filterType'] == 'mensual') ?>>Mensual</option>
+                          <option value="trimestral" <?php if (!empty($_GET['filterType']) && $_GET['filterType'] == 'trimestral') ?>>Trimestral</option>
+                          <option value="rango" <?php if (!empty($_GET['filterType']) && $_GET['filterType'] == 'rango') ?>>Rango de fechas</option>
                         </select>
                       </div>
-                      <div class="form-group">
-                        <label for="yearSelect">Seleccione un año:</label>
-                        <select id="yearSelect" name="year" class="form-control" required>
-                          <?php
-                          $currentYear = date('Y');
-                          for ($year = $currentYear; $year >= 2000; $year--) {
-                            echo "<option value=\"$year\"" . ($selectedYear == $year ? ' selected' : '') . ">$year</option>";
-                          }
-                          ?>
-                        </select>
+                      <div id="filtrosAdicionales" class="form-group">
                       </div>
                       <button type="submit" class="btn btn-primary">Filtrar</button>
                     </form>
 
-                    <table id="example1" class="table table-bordered table-striped table-responsive">
+                    <table id="example1" class="table table-bordered table-striped ">
                       <thead>
                         <tr>
-                          <th>Datos Generales</th>
+                          <th colspan="2">Datos Generales</th>
                           <th colspan="2">Indicadores de Gestión (20%)</th>
                           <th colspan="3">Indicadores de Gestión Operativa (100%)</th>
                           <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
                         </tr>
                         <tr>
+                          <th>Mes</th>
                           <th>Centro</th>
                           <th>% de Convenios Estratégicos Reportados (10%)</th>
                           <th>% de Compromisos institucionales cumplidos (10%)</th>
                           <th>% de Operatividad de cámaras (20%)</th>
                           <th>% de Ausentismo Operativo (20%)</th>
                           <th>% de Cumplimiento Mobile Locator (10%)</th>
-                          <th>Incumplimiento de disposiciones (20%)</th>
-                          <th>Comunicación Estratégica (10%)</th>
+                          <th>% Incumplimiento de disposiciones (20%)</th>
+                          <th>% Comunicación Estratégica (10%)</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -319,6 +275,7 @@ $stmt->execute($params);
                         if ($stmt->rowCount() > 0) {
                           while ($row = $stmt->fetch()) {
                             echo "<tr>";
+                            echo "<td>" . $row['mes_creado'] . "</td>";
                             echo "<td>" . $row['nombre_centro'] . "</td>";
                             echo "<td>" . $row['conve_stra'] . "</td>";
                             echo "<td>" . $row['comp_insti'] . "</td>";
@@ -330,7 +287,7 @@ $stmt->execute($params);
                             echo "</tr>\n";
                           }
                         } else {
-                          echo "<tr class='text-center'><td colspan='8'>No existen registros</td></tr>";
+                          echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
                         }
                         ?>
                       </tbody>
@@ -407,20 +364,12 @@ $stmt->execute($params);
   <script>
     $(function() {
       $("#example1").DataTable({
-        "responsive": true,
-        "lengthChange": false,
-        "autoWidth": false,
+        "responsive": false,
+        "lengthChange": true,
+        "autoWidth": true,
+        "scrollX": false,
         "buttons": ["copy", "excel", "pdf", "print", "colvis"]
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-      $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": false,
-      });
     });
   </script>
 
@@ -434,7 +383,75 @@ $stmt->execute($params);
         .catch(error => console.error('Error:', error));
     }
   </script>
+  <script>
+    document.getElementById('filterTypeSelect').addEventListener('change', function() {
+      var filtrosAdicionales = document.getElementById('filtrosAdicionales');
 
+      // Limpia el contenido del contenedor
+      filtrosAdicionales.innerHTML = '';
+
+      if (this.value === 'trimestral') {
+        // Agrega los selectores de trimestre y año
+        filtrosAdicionales.innerHTML = `
+            <label for="trimestreSelect">Seleccione un trimestre:</label>
+            <select id="trimestreSelect" name="trimestre" class="form-control">
+                <option value="1">Trimestre 1</option>
+                <option value="2">Trimestre 2</option>
+                <option value="3">Trimestre 3</option>
+                <option value="4">Trimestre 4</option>
+            </select>
+            <label for="yearSelect">Seleccione un año:</label>
+            <select id="yearSelect" name="year" class="form-control" required>
+                <?php
+                $currentYear = date('Y');
+                for ($year = $currentYear; $year >= 2000; $year--) {
+                  echo "<option value=\"$year\"" . ($selectedYear == $year ? ' selected' : '') . ">$year</option>";
+                }
+                ?>
+            </select>
+        `;
+      } else if (this.value === 'mensual') { // Agrega esta condición
+        // Agrega los selectores de mes y año
+        filtrosAdicionales.innerHTML = `
+            <label for="monthSelect">Seleccione un mes:</label>
+            <select id="monthSelect" name="month" class="form-control">
+                <option value="" selected>Seleccione un mes</option>
+                <option value="01" <?= $selectedMonth == '01' ? 'selected' : '' ?>>Enero</option>
+                <option value="02" <?= $selectedMonth == '02' ? 'selected' : '' ?>>Febrero</option>
+                <option value="03" <?= $selectedMonth == '03' ? 'selected' : '' ?>>Marzo</option>
+                <option value="04" <?= $selectedMonth == '04' ? 'selected' : '' ?>>Abril</option>
+                <option value="05" <?= $selectedMonth == '05' ? 'selected' : '' ?>>Mayo</option>
+                <option value="06" <?= $selectedMonth == '06' ? 'selected' : '' ?>>Junio</option>
+                <option value="07" <?= $selectedMonth == '07' ? 'selected' : '' ?>>Julio</option>
+                <option value="08" <?= $selectedMonth == '08' ? 'selected' : '' ?>>Agosto</option>
+                <option value="09" <?= $selectedMonth == '09' ? 'selected' : '' ?>>Septiembre</option>
+                <option value="10" <?= $selectedMonth == '10' ? 'selected' : '' ?>>Octubre</option>
+                <option value="11" <?= $selectedMonth == '11' ? 'selected' : '' ?>>Noviembre</option>
+                <option value="12" <?= $selectedMonth == '12' ? 'selected' : '' ?>>Diciembre</option>
+            </select>
+            <label for="yearSelect">Seleccione un año:</label>
+            <select id="yearSelect" name="year" class="form-control" required>
+                <?php
+                $currentYear = date('Y');
+                for ($year = $currentYear; $year >= 2000; $year--) {
+                  echo "<option value=\"$year\"" . ($selectedYear == $year ? ' selected' : '') . ">$year</option>";
+                }
+                ?>
+            </select>
+        `;
+      } else if (this.value === 'rango') {
+        // Agrega los campos de rango de fechas
+        filtrosAdicionales.innerHTML = `
+            <label for="fechaInicio">Fecha de inicio:</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?= $fechaInicio ?>">
+
+            <label for="fechaFin">Fecha de fin:</label>
+            <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?= $fechaFin ?>">
+        `;
+      }
+
+    });
+  </script>
 </body>
 
 </html>

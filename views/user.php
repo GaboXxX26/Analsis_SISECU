@@ -155,7 +155,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <li class="nav-item">
               <a href="tabla_admin.php" class="nav-link">
                 <i class="nav-icon fas fa-table"></i>
-                <p>Indicadores</p>
+                <p>Historico</p>
               </a>
             </li>
             <li class="nav-item">
@@ -316,6 +316,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
 
       if (section === 'parametro') {
         loadContent('parametro.php'); 
+      } else if(section === 'nuevo usuario'){
+        loadContent('index.php');
+      } else if(section === 'editar'){
+        loadContent('admin.php');
+      } else if(section === 'elimniar'){
+        loadContent('admin.php');
       }
     });
   </script>

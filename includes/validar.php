@@ -32,7 +32,7 @@ if (isset($_POST['registrar'])) {
         $estado = trim($_POST['estado']);
 
         // Encriptar la contraseña con AES-256-CBC
-        $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";// ¡Cambia esto por una clave realmente segura!
+        $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#"; // ¡Cambia esto por una clave realmente segura!
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $encryptedPassword = openssl_encrypt($password, 'aes-256-cbc', $key, 0, $iv);
         $encryptedPassword = base64_encode($encryptedPassword . '::' . $iv); // Combinar contraseña y IV
@@ -57,6 +57,7 @@ if (isset($_POST['registrar'])) {
             'estado' => $estado
         ]);
 
-        header('Location: ../views/user.php');
+        echo "<script>alert('Usuario desactivado exitosamente.');</script>";
+        echo "<script>window.location.href = '../views/user.php?section=nuevo usuario';</script>";
     }
 }

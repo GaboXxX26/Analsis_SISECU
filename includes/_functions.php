@@ -75,7 +75,7 @@ function editar_registro()
     $stmt->execute();
 
     echo "<script>alert('Usuario actualizado exitosamente.');</script>";
-    echo "<script>window.location.href = '../views/user.php';</script>";
+    echo "<script>window.location.href = '../views/user.php?section=editar';</script>";
 }
 
 /**
@@ -96,7 +96,8 @@ function eliminar_registro()
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
-    header('Location: ../views/user.php');
+    echo "<script>alert('Usuario desactivado exitosamente.');</script>";
+    echo "<script>window.location.href = '../views/user.php?section=elimniar';</script>";
 }
 
 // function acceso_user()
@@ -236,7 +237,8 @@ function solicitar_recuperacion()
     }
 }
 
-function parametros() {
+function parametros()
+{
     global $pdo;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['parametros'])) {
@@ -280,4 +282,3 @@ function parametros() {
         }
     }
 }
-
