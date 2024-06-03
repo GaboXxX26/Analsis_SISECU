@@ -290,7 +290,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
       $('#example2').DataTable({
         "paging": true,
-        "lengthChange": false,
+        "lengthChange": true,
         "searching": false,
         "ordering": true,
         "info": true,
@@ -315,17 +315,16 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       const section = urlParams.get('section');
 
       if (section === 'parametro') {
-        loadContent('parametro.php'); 
-      } else if(section === 'nuevo usuario'){
+        loadContent('parametro.php');
+      } else if (section === 'nuevo usuario') {
         loadContent('index.php');
-      } else if(section === 'editar'){
+      } else if (section === 'editar') {
         loadContent('admin.php');
-      } else if(section === 'elimniar'){
+      } else if (section === 'elimniar') {
         loadContent('admin.php');
       }
     });
   </script>
-
 </body>
 
 </html>

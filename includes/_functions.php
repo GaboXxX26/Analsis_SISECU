@@ -1,5 +1,9 @@
 <?php
 include "_db.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+session_start();
 
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -23,8 +27,8 @@ if (isset($_POST['accion'])) {
         case 'solicitar_recuperacion';
             solicitar_recuperacion();
             break;
-        case 'parametros';
-            parametros();
+        case 'actualizar_registro';
+            actualizar_registro();
             break;
     }
 }
@@ -237,48 +241,78 @@ function solicitar_recuperacion()
     }
 }
 
-function parametros()
+function actualizar_registro()
 {
-    global $pdo;
+    global $pdo; 
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['parametros'])) {
-        // Array para almacenar los datos validados
-        $parametrosValidos = [];
+    // Verificar si se recibieron datos
+    if (
+        isset($_POST['id_registro']) &&
+        isset($_POST['conve_stra']) &&
+        isset($_POST['comp_insti']) &&
+        isset($_POST['opera_cam']) &&
+        isset($_POST['ausentimo']) &&
+        isset($_POST['mobile_locator']) &&
+        isset($_POST['dispoci']) &&
+        isset($_POST['com_estra']) &&
+        count($_POST['id_registro']) === count($_POST['conve_stra'])
+    ) {
+        // Iterar sobre los registros
+        foreach ($_POST['id_registro'] as $index => $id_registro) {
+            // Obtener los valores de los campos para este registro
+            $conve_stra = $_POST['conve_stra'][$index];
+            $comp_insti = $_POST['comp_insti'][$index];
+            $opera_cam = $_POST['opera_cam'][$index];
+            $ausentimo = $_POST['ausentimo'][$index];
+            $mobile_locator = $_POST['mobile_locator'][$index];
+            $dispoci = $_POST['dispoci'][$index];
+            $com_estra = $_POST['com_estra'][$index];
+            $sql = "UPDATE registros SET 
+                conve_stra = :conve_stra,
+                comp_insti = :comp_insti,
+                opera_cam = :opera_cam,
+                ausentimo = :ausentimo,
+                mobile_locator = :mobile_locator,
+                dispoci = :dispoci,
+                com_estra = :com_estra
+            WHERE id_registro = :id_registro";
+            $stmt = $pdo->prepare($sql);
+            // Vincular los parámetros
+            $stmt->bindParam(':conve_stra', $conve_stra);
+            $stmt->bindParam(':comp_insti', $comp_insti);
+            $stmt->bindParam(':opera_cam', $opera_cam);
+            $stmt->bindParam(':ausentimo', $ausentimo);
+            $stmt->bindParam(':mobile_locator', $mobile_locator);
+            $stmt->bindParam(':dispoci', $dispoci);
+            $stmt->bindParam(':com_estra', $com_estra);
+            $stmt->bindParam(':id_registro', $id_registro);
 
-        // Iteramos sobre los posibles parámetros (1 a 4)
-        for ($i = 1; $i <= 4; $i++) {
-            $parametro = filter_input(INPUT_POST, 'parametro_' . $i, FILTER_VALIDATE_INT);
-            $color = filter_input(INPUT_POST, 'color_' . $i, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $nombre = filter_input(INPUT_POST, 'nombre_' . $i, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-            // Si todos los campos son válidos, los agregamos al array
-            if ($parametro !== false && !empty($color) && !empty($nombre)) {
-                $parametrosValidos[] = [
-                    'parametro' => $parametro,
-                    'color' => $color,
-                    'nombre' => $nombre
-                ];
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                // Registro actualizado con éxito
+            } else {
+                // Error al actualizar el registro
+                echo "<script>alert('Error al actualizar el registro con ID: $id_registro');</script>";
             }
         }
 
-        // Si hay parámetros válidos, los insertamos en la base de datos
-        if (!empty($parametrosValidos)) {
-            try {
-                $pdo->beginTransaction(); // Iniciamos una transacción
+        echo "<script>alert('Registros actualizados exitosamente.');;
+        setTimeout(function() {";
 
-                $stmt = $pdo->prepare("INSERT INTO public.parametros (parametro, color, nombre) VALUES (:parametro, :color, :nombre)");
+        $rol_id = $_SESSION['rol_id'];
+        $paginas_redireccion = [
+            'add38db6-1687-4e57-a763-a959400d9da2' => 'user.php',
+            'e17a74c4-9627-443c-b020-23dc4818b718' => 'lector.php',
+            'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => 'analista.php'
+        ];
 
-                foreach ($parametrosValidos as $param) {
-                    $stmt->execute($param);
-                }
-
-                $pdo->commit(); // Confirmamos la transacción
-
-            } catch (PDOException $e) {
-                $pdo->rollBack(); // Revertimos la transacción en caso de error
-                error_log("Error en la inserción de datos: " . $e->getMessage());
-                // Manejo de errores (mostrar mensaje, redirigir, etc.)
-            }
+        if (array_key_exists($rol_id, $paginas_redireccion)) {
+            echo "window.location.href = '../views/" . $paginas_redireccion[$rol_id] . "';";
+        } else {
+            echo "window.location.href = '../views/acceso_denegado.php';";
         }
+
+        echo "}, 1000); 
+        </script>";
     }
 }

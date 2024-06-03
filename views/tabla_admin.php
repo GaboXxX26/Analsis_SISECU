@@ -13,7 +13,7 @@ $fechaInicio = $selectedRango && isset($_GET['fechaInicio']) ? $_GET['fechaInici
 $fechaFin = $selectedRango && isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
 
 // Construir la consulta SQL con condiciones opcionales
-$consulta = "SELECT c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra, TO_CHAR(r.created_at, 'TMMonth') AS mes_creado
+$consulta = "SELECT r.id_registro,c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra, TO_CHAR(r.created_at, 'TMMonth') AS mes_creado
                 FROM public.registros AS r 
                 LEFT JOIN centro AS c ON c.id_centro = r.id_centro
                 WHERE r.id_centro = :selectedCentro";
@@ -141,7 +141,7 @@ $stmt->execute($params);
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-            <li class="nav-item menu-open">
+            <li class="nav-item ">
               <a href="#" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
@@ -154,18 +154,16 @@ $stmt->execute($params);
                 <p>Usuarios</p>
               </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item menu-open">
               <a href="user.php" class="nav-link">
                 <i class="nav-icon fas fa-table"></i>
-                <p>Indicadores</p>
+                <p>Historico</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="user.php" class="nav-link">
                 <i class="nav-icon fas fa-edit"></i>
-                <p>
-                  Nuevo usuario
-                </p>
+                <p>Nuevo usuario</p>
               </a>
             </li>
             <li class="nav-item">
@@ -178,6 +176,12 @@ $stmt->execute($params);
               <a href="user.php" class="nav-link ">
                 <i class="nav-icon fas fa-chart-pie"></i>
                 <p>Resultado</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="user.php" class="nav-link">
+                <i class="nav-icon fas fa-table"></i>
+                <p>Parametros</p>
               </a>
             </li>
           </ul>
@@ -249,49 +253,55 @@ $stmt->execute($params);
                       </div>
                       <button type="submit" class="btn btn-primary">Filtrar</button>
                     </form>
+                    <form action="../includes/_functions.php" method="POST">
+                      <table id="example1" class="table table-bordered table-striped table-responsive ">
+                        <thead>
+                          <tr>
+                            <th colspan="2">Datos Generales</th>
+                            <th colspan="2">Indicadores de Gestión (20%)</th>
+                            <th colspan="3">Indicadores de Gestión Operativa (100%)</th>
+                            <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
+                          </tr>
+                          <tr>
+                            <th>Mes</th>
+                            <th>Centro</th>
+                            <th>% de Convenios Estratégicos Reportados (10%)</th>
+                            <th>% de Compromisos institucionales cumplidos (10%)</th>
+                            <th>% de Operatividad de cámaras (20%)</th>
+                            <th>% de Ausentismo Operativo (20%)</th>
+                            <th>% de Cumplimiento Mobile Locator (10%)</th>
+                            <th>% Incumplimiento de disposiciones (20%)</th>
+                            <th>% Comunicación Estratégica (10%)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                          if ($stmt->rowCount() > 0) {
+                            while ($row = $stmt->fetch()) {
+                              echo "<tr>";
+                              echo "<td>" . $row['mes_creado'] . "</td>";
+                              echo "<td>" . $row['nombre_centro'] . "</td>";
+                              // Campos con nombres de array y valores precargados
+                              echo "<input type='hidden' name='id_registro[]' value='" . $row['id_registro'] . "'>";
+                              echo "<td><input type='number' name='conve_stra[]' value='" . $row['conve_stra'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='comp_insti[]' value='" . $row['comp_insti'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='opera_cam[]' value='" . $row['opera_cam'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='ausentimo[]' value='" . $row['ausentimo'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='mobile_locator[]' value='" . $row['mobile_locator'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='dispoci[]' value='" . $row['dispoci'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' name='com_estra[]' value='" . $row['com_estra'] . "' min='0' max='100'step='0.01'></td>";
 
-                    <table id="example1" class="table table-bordered table-striped ">
-                      <thead>
-                        <tr>
-                          <th colspan="2">Datos Generales</th>
-                          <th colspan="2">Indicadores de Gestión (20%)</th>
-                          <th colspan="3">Indicadores de Gestión Operativa (100%)</th>
-                          <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
-                        </tr>
-                        <tr>
-                          <th>Mes</th>
-                          <th>Centro</th>
-                          <th>% de Convenios Estratégicos Reportados (10%)</th>
-                          <th>% de Compromisos institucionales cumplidos (10%)</th>
-                          <th>% de Operatividad de cámaras (20%)</th>
-                          <th>% de Ausentismo Operativo (20%)</th>
-                          <th>% de Cumplimiento Mobile Locator (10%)</th>
-                          <th>% Incumplimiento de disposiciones (20%)</th>
-                          <th>% Comunicación Estratégica (10%)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <?php
-                        if ($stmt->rowCount() > 0) {
-                          while ($row = $stmt->fetch()) {
-                            echo "<tr>";
-                            echo "<td>" . $row['mes_creado'] . "</td>";
-                            echo "<td>" . $row['nombre_centro'] . "</td>";
-                            echo "<td>" . $row['conve_stra'] . "</td>";
-                            echo "<td>" . $row['comp_insti'] . "</td>";
-                            echo "<td>" . $row['opera_cam'] . "</td>";
-                            echo "<td>" . $row['ausentimo'] . "</td>";
-                            echo "<td>" . $row['mobile_locator'] . "</td>";
-                            echo "<td>" . $row['dispoci'] . "</td>";
-                            echo "<td>" . $row['com_estra'] . "</td>";
-                            echo "</tr>\n";
+                              echo "</tr>\n";
+                            }
+                          } else {
+                            echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
                           }
-                        } else {
-                          echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
-                        }
-                        ?>
-                      </tbody>
-                    </table>
+                          ?>
+                        </tbody>
+                      </table>
+                      <input type="hidden" name="accion" value="actualizar_registro">
+                      <button type="submit" class="btn btn-primary">Editar</button>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -367,7 +377,7 @@ $stmt->execute($params);
         "responsive": false,
         "lengthChange": true,
         "autoWidth": true,
-        "scrollX": false,
+        "scrollX": true,
         "buttons": ["copy", "excel", "pdf", "print", "colvis"]
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });

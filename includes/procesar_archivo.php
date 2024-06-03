@@ -46,15 +46,55 @@ if ($validar == null || $validar == '') {
                     <div class="card-body">
 
                         <?php
-                        // require '../vendor/autoload.php';
-
-                        // use PhpOffice\PhpSpreadsheet\IOFactory;
 
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             if (isset($_FILES["excelfile"]) && $_FILES["excelfile"]["error"] === UPLOAD_ERR_OK) {
                                 $archivo = $_FILES["excelfile"]["tmp_name"];
                                 $spreadsheet = IOFactory::load($archivo);
                                 $sheet = $spreadsheet->getActiveSheet();
+
+                                $validacionExitosa = true;
+                                // Validación del formato y contenido
+                                $validacionExitosa = true;
+                                $erroresValidacion = [];
+                                try {
+                                    // Validar celdas vacías después de la columna I
+                                    $highestRow = $sheet->getHighestRow();
+                                    $highestColumn = $sheet->getHighestColumn();
+
+                                    for ($row = 3; $row <= $highestRow; $row++) {
+                                        for ($col = 'J'; $col <= $highestColumn; $col++) {
+                                            $valorCelda = $sheet->getCell($col . $row)->getValue();
+                                            if (!empty($valorCelda)) {
+                                                $erroresValidacion[] = "Error: Se encontraron datos después de la columna I en la celda " . $col . $row;
+                                                throw new Exception("Error: Se encontraron datos después de la columna I.");
+                                            }
+                                            // Validación adicional (ejemplo: verificar si la celda contiene un valor específico)
+                                            if ($valorCelda !== null && $valorCelda !== 'valor_esperado') {
+                                                $erroresValidacion[] = "Error: El valor en la celda " . $col . $row . " no es el esperado.";
+                                                throw new Exception("Error: El valor en la celda " . $col . $row . " no es el esperado.");
+                                            }
+                                        }
+                                    }
+
+                                    // Validar orden de los centros
+                                    $centrosEsperados = ['Ambato', 'Babahoyo', 'Cuenca', 'Esmeraldas', 'Ibarra', 'Loja', 'Macas', 'Machala', 'Nueva Loja', 'Portoviejo', 'Quito', 'Riobamba', 'Samborondón', 'San Cristóbal', 'Santo Domingo', 'Tulcán'];
+                                    $centrosEncontrados = [];
+                                    for ($row = 3; $row <= 18; $row++) {
+                                        $centrosEncontrados[] = $sheet->getCell('B' . $row)->getValue();
+                                    }
+
+                                    if ($centrosEncontrados !== $centrosEsperados) {
+                                        $erroresValidacion[] = "Error: El orden de los centros no es el esperado.";
+                                        throw new Exception("Error: El orden de los centros no es el esperado.");
+                                    }
+                                } catch (Exception $e) {
+                                    $validacionExitosa = false;
+                                }
+
+                                echo '<input type="hidden" id="validacion-exitosa" value="' . ($validacionExitosa ? 'true' : 'false') . '">';
+                                echo '<input type="hidden" id="errores-validacion" value="' . htmlentities(json_encode($erroresValidacion)) . '">';
+
 
                                 // Validación básica del archivo (puedes agregar más validaciones)
                                 $highestRow = $sheet->getHighestRow();
@@ -63,7 +103,8 @@ if ($validar == null || $validar == '') {
                                 if ($highestRow < 3 || $highestColumn < 'I') {
                                     echo "El archivo Excel no tiene el formato esperado.";
                                 } else {
-                                    // Obtener los nombres de los centros desde la segunda fila (asumiendo que están en la columna B)
+                                    // Obtener los nombres de los centros desde la segunda fila (asumiendo que están en la columna B) 
+                                    $rangoCeldasVacias = 'J3:' . $highestColumn . $highestRow; // Construir el rango con la letra de la columna
                                     $centros = [];
                                     for ($row = 3; $row <= $highestRow; $row++) {
                                         $nombreCentro = $sheet->getCell('B' . $row)->getValue();
@@ -104,6 +145,8 @@ if ($validar == null || $validar == '') {
                                     ];
 
                                     // Generar el formulario HTML
+                                    echo '<h2 class="mb-4">Indicadores desde el excel</h2>';
+                                    echo '<label for="centroSelect">Verifique que los datos sean correcos:</label>';
                                     echo '<form action="./procesar_centro.php" method="POST" id="formTabla">';
                                     echo '<input type="hidden" name="num_centros" value="' . count($centros) . '">';
 
@@ -143,7 +186,7 @@ if ($validar == null || $validar == '') {
                                             if (is_numeric($valor)) {
                                                 $valor = floatval($valor) * 100;
                                             }
-                                            echo "<td><input type='number' class='form-control' name='{$campo}' value='{$valor}' min='0' max='100' step='0.01' style='width: 100%;' readonly></td>";
+                                            echo "<td><input type='number' class='form-control' name='{$campo}' value='{$valor}' min='0' max='100' step='0.01' style='width: 100%;'></td>";
                                         }
 
                                         echo '</tr>';
@@ -153,6 +196,7 @@ if ($validar == null || $validar == '') {
                                     echo '</table>';
 
                                     echo '<input type="submit" class="btn btn-block bg-gradient-success " name="registrar_centro" value="Subir informacion">';
+                                    echo '<a class="btn btn-block bg-gradient-danger" href="javascript:void(0);" onclick="history.back();">Cancelar</a>';
                                     echo '</form>';
                                 }
                             }
@@ -173,12 +217,6 @@ if ($validar == null || $validar == '') {
     <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <script>
         $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -190,5 +228,19 @@ if ($validar == null || $validar == '') {
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const validacionExitosa = document.getElementById('validacion-exitosa').value === 'true';
+            if (!validacionExitosa) {
+                const errores = JSON.parse(document.getElementById('errores-validacion').value);
+                alert('Error en la validación del archivo:\n' + errores.join('\n'));
+                // Redirigir a la página anterior
+                history.back();
+            }
+        });
+    </script>
+
+
 </body>
+
 </html>

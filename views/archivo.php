@@ -3,11 +3,10 @@
         <form action="../includes/procesar_archivo.php" method="post" enctype="multipart/form-data">
             <div class="card-body">
                 <div class="form-group">
-                    <label for="excelfile">Archivo Excel</label>
+                    <label for="formFile" class="form-label">Seleciona un archivo excel:</label>
                     <div class="input-group">
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="excelfile" name="excelfile" accept=".xls, .xlsx" required>
-                            <label class="custom-file-label" for="excelfile">Elija un archivo</label>
+                            <input type="file" id="excelfile" name="excelfile" accept=".xls, .xlsx" required>
                         </div>
                     </div>
                 </div>
