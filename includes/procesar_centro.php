@@ -8,11 +8,15 @@ session_start();
 if (isset($_POST['registrar_centro'])) {
     $num_centros = 16;
 
-    // Preparar la consulta (usando try...catch para manejo de errores)
     try {
-        $consulta = "INSERT INTO public.registros(id_registro, id_centro, conve_stra, comp_insti, opera_cam, ausentimo, mobile_locator, dispoci, com_estra)
-                    VALUES (uuid_generate_v4(), :id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra)";
-        $stmt = $pdo->prepare($consulta);
+        // Preparar la consulta de inserción
+        $consulta_insert = "INSERT INTO public.registros(id_registro, id_centro, conve_stra, comp_insti, opera_cam, ausentimo, mobile_locator, dispoci, com_estra, created_at)
+                            VALUES (uuid_generate_v4(), :id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra, NOW())";
+        $stmt_insert = $pdo->prepare($consulta_insert);
+
+        // Preparar la consulta de verificación
+        $consulta_verificar = "SELECT COUNT(*) FROM public.registros WHERE id_centro = :id_centro AND DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)";
+        $stmt_verificar = $pdo->prepare($consulta_verificar);
 
         for ($i = 1; $i <= $num_centros; $i++) {
             $id_centro = $_POST['id_centro_' . $i];
@@ -24,16 +28,26 @@ if (isset($_POST['registrar_centro'])) {
             $dispoci = $_POST['dispoci_' . $i];
             $com_estra = $_POST['com_estra_' . $i];
 
-            $stmt->execute([
-                'id_centro' => $id_centro,
-                'conve_stra' => $conve_stra,
-                'comp_insti' => $comp_insti,
-                'opera_cam' => $opera_cam,
-                'ausentimo' => $ausentimo,
-                'mobile_locator' => $mobile_locator,
-                'dispoci' => $dispoci,
-                'com_estra' => $com_estra
-            ]);
+            // Verificar si ya existe un registro para el centro en el mes actual
+            $stmt_verificar->execute(['id_centro' => $id_centro]);
+            $existe_registro = $stmt_verificar->fetchColumn();
+
+            if ($existe_registro == 0) {
+                // No existe registro para el centro en el mes actual, proceder con la inserción
+                $stmt_insert->execute([
+                    'id_centro' => $id_centro,
+                    'conve_stra' => $conve_stra,
+                    'comp_insti' => $comp_insti,
+                    'opera_cam' => $opera_cam,
+                    'ausentimo' => $ausentimo,
+                    'mobile_locator' => $mobile_locator,
+                    'dispoci' => $dispoci,
+                    'com_estra' => $com_estra
+                ]);
+            } else {
+                // Ya existe un registro para el centro en el mes actual, mostrar mensaje de advertencia
+                echo "<script>alert('Ya existe un registro para el centro $id_centro en el mes actual.'); window.history.back();</script>";
+            }
         }
 
         // Alerta de éxito (usando JavaScript)
@@ -58,7 +72,8 @@ if (isset($_POST['registrar_centro'])) {
     </script>";
     } catch (PDOException $e) {
         // Manejo de errores en la inserción
-        echo "<script>alert('Error al guardar los registros: " . $e->getMessage() . "');</script>";
+        echo "<script>alert('Error al guardar los registros: " . $e->getMessage() . "'); window.history.back();</script>";
         // Opcional: registrar el error en un archivo de registro
     }
 }
+
