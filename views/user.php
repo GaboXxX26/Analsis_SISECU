@@ -33,7 +33,7 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
   'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
   'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 
@@ -45,6 +45,47 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
   die();
 }
+
+$consulta = "SELECT c.nombre_centro,
+                    r.conve_stra,
+                    r.comp_insti,
+                    r.opera_cam,
+                    r.ausentimo,
+                    r.mobile_locator,
+                    r.dispoci,
+                    r.com_estra
+            FROM public.registros AS r
+            LEFT JOIN centro AS c ON c.id_centro = r.id_centro
+            WHERE r.created_at = (
+                SELECT MAX(created_at)
+                FROM public.registros r2
+                WHERE r2.id_centro = r.id_centro
+            )
+            ORDER BY c.nombre_centro";
+$stmt = $pdo->query($consulta);
+
+if ($stmt->rowCount() > 0) {
+  while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+    // Calcular los promedios sin multiplicar por los porcentajes
+    $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
+    $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
+    $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
+
+    $promedio_gestion_formatted = number_format($promedio_gestion, 2);
+    $promedio_operativa_formatted = number_format($promedio_operativa, 2);
+    $promedio_calidad_formatted = number_format($promedio_calidad, 2);
+
+    // Calcular la suma total del centro
+    $suma_total_centro = $promedio_gestion + $promedio_operativa + $promedio_calidad;
+    $nombresCentros[] = $row['nombre_centro'];
+    $totalesCumplimiento[] = number_format($suma_total_centro, 2); // Formatear a 2 decimales
+    $promediosGestion[] = $promedio_gestion_formatted;
+    $promediosOperativa[] = $promedio_operativa_formatted;
+    $promediosCalidad[] = $promedio_calidad_formatted;
+  }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -139,31 +180,40 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
-            <li class="nav-item menu-open">
-              <a href="#" class="nav-link ">
+            <li class="nav-item ">
+              <a href="./user.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
                 </p>
               </a>
             <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('admin.php')">
-                <i class="nav-icon far fa-user"></i>
-                <p>Usuarios</p>
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>
+                  Usuario
+                  <i class="right fas fa-angle-left"></i>
+                </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link " onclick="loadContent('admin.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Usuarios</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link" onclick="loadContent('index.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nuevo usuario</p>
+                  </a>
+                </li>
+              </ul>
             </li>
             <li class="nav-item">
               <a href="tabla_admin.php" class="nav-link">
                 <i class="nav-icon fas fa-table"></i>
-                <p>Historico</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link" onclick="loadContent('index.php')">
-                <i class="nav-icon fas fa-edit"></i>
-                <p>
-                  Nuevo usuario
-                </p>
+                <p>Registros</p>
               </a>
             </li>
             <li class="nav-item">
@@ -173,16 +223,39 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('chart.php')">
-                <i class="nav-icon fas fa-chart-pie"></i>
-                <p>Resultado</p>
-              </a>
-            </li>
-            <li class="nav-item">
               <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
                 <i class="nav-icon fas fa-table"></i>
                 <p>Parametrizacion</p>
               </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>
+                  Estadisticas
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="./historico.php" class="nav-link" ">
+                    <i class=" far fa-circle nav-icon"></i>
+                    <p>Historico</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./comparativo.php" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Comparativo</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Resultado</p>
+                  </a>
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>
@@ -210,26 +283,113 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
             <div class="col-12">
               <div class="card">
                 <!-- /.card-header -->
-                <div class="card-body">
-                  <div id="content-container"></div>
+                <div id="chart-container">
+                  <div class="card-body">
+                    <div class="col-md-12">
+                      <div class="card card-success">
+                        <div class="card-header">
+                          <h3 class="card-title">Resultados Nacionales</h3>
+                          <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                              <i class="fas fa-minus"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <div class="chart">
+                            <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="card card-success">
+                          <div class="card-header">
+                            <h3 class="card-title">Gestión Interinstitucional</h3>
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="chart">
+                              <canvas id="intChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="card card-success">
+                          <div class="card-header">
+                            <h3 class="card-title">Gestión Operativa</h3>
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="chart">
+                              <canvas id="opeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card card-success">
+                          <div class="card-header">
+                            <h3 class="card-title">Gestión Estratégica</h3>
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="chart">
+                              <canvas id="estraChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card card-success">
+                          <div class="card-header">
+                            <h3 class="card-title">Total Cumplimiento de Gestión</h3>
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="chart">
+                              <canvas id="resaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <div id="content-container"></div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
-      Todos los derechos reservados.
-    </footer>
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-      <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+    Todos los derechos reservados.
+  </footer>
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
   <!-- jQuery -->
@@ -281,6 +441,297 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
   <!-- Page specific script -->
   <script>
+  function checkContent() {
+    var contentContainer = document.getElementById('content-container');
+    var chartContainer = document.getElementById('chart-container');
+
+    if (contentContainer.innerHTML.trim() !== '') {
+      chartContainer.style.display = 'none';
+    } else {
+      chartContainer.style.display = 'block';
+    }
+  }
+
+  // Call checkContent when the page loads
+  window.onload = checkContent;
+
+  // Call checkContent whenever the content of the content-container changes
+  var contentContainerObserver = new MutationObserver(checkContent);
+  contentContainerObserver.observe(document.getElementById('content-container'), {
+    childList: true,
+    subtree: true
+  });
+
+  // Show chart container when "Historico" is clicked
+  document.getElementById('historico-link').addEventListener('click', function() {
+    document.getElementById('chart-container').style.display = 'block';
+  });
+</script>
+  <script>
+    $(function() {
+      var areaChartData = {
+        labels: <?php echo json_encode($nombresCentros); ?>,
+        datasets: [{
+          label: 'Gestión Interinstitucional (20%)',
+          backgroundColor: 'rgba(255, 0, 0, 0.5)',
+          borderColor: 'rgba(255, 0, 0, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosGestion); ?>,
+          fill: false,
+          lineTension: 0
+        }, {
+          label: 'Gestión Operativa (50%)',
+          backgroundColor: 'rgba(0, 255, 0, 0.5)',
+          borderColor: 'rgba(0, 255, 0, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosOperativa); ?>,
+          fill: false,
+          lineTension: 0
+        }, {
+          label: 'Gestión Estratégica (30%)',
+          backgroundColor: 'rgba(0, 0, 255, 0.5)',
+          borderColor: 'rgba(0, 0, 255, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosCalidad); ?>,
+          fill: false,
+          lineTension: 0
+        }, {
+          label: 'Total Cumplimiento de Gestión (100%)',
+          backgroundColor: 'rgba(255, 17, 0, 1)',
+          borderColor: 'rgba(60,141,188,0.8)',
+          pointRadius: true,
+          pointColor: '#3b8bba',
+          pointStrokeColor: 'rgba(60,141,188,1)',
+          pointHighlightFill: '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data: <?php echo json_encode($totalesCumplimiento); ?>,
+          fill: false,
+          lineTension: 0
+        }]
+      }
+
+      var barChartCanvas = $('#barChart').get(0).getContext('2d')
+      var barChartData = $.extend(true, {}, areaChartData)
+
+      var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false,
+        legend: {
+          display: true
+        },
+        scales: {
+          xAxes: [{
+            gridLines: {
+              display: false,
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              display: true,
+            }
+          }]
+        },
+
+      }
+
+      new Chart(barChartCanvas, {
+        type: 'line',
+        data: barChartData,
+        options: barChartOptions
+      })
+    })
+  </script>
+  <script>
+    $(function() {
+      var areaChartData = {
+        labels: <?php echo json_encode($nombresCentros); ?>,
+        datasets: [{
+          label: 'Gestión Interinstitucional (20%)',
+          backgroundColor: 'rgba(255, 0, 0, 0.5)',
+          borderColor: 'rgba(255, 0, 0, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosGestion); ?>,
+          fill: false,
+          lineTension: 0
+        }]
+      }
+      var barChartCanvas = $('#intChart').get(0).getContext('2d')
+      var barChartData = $.extend(true, {}, areaChartData)
+
+      var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false,
+        legend: {
+          display: true,
+        },
+        scales: {
+          xAxes: [{
+            gridLines: {
+              display: false,
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              display: true,
+            }
+          }]
+        },
+
+      }
+      new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+      })
+
+    })
+  </script>
+  <script>
+    $(function() {
+      var areaChartData = {
+        labels: <?php echo json_encode($nombresCentros); ?>,
+        datasets: [{
+          label: 'Gestión Operativa (50%)',
+          backgroundColor: 'rgba(0, 255, 0, 0.5)',
+          borderColor: 'rgba(0, 255, 0, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosOperativa); ?>,
+          fill: false,
+          lineTension: 0
+        }]
+      }
+      var barChartCanvas = $('#opeChart').get(0).getContext('2d')
+      var barChartData = $.extend(true, {}, areaChartData)
+
+      var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false,
+        legend: {
+          display: true,
+        },
+        scales: {
+          xAxes: [{
+            gridLines: {
+              display: false,
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              display: true,
+            }
+          }]
+        },
+
+      }
+      new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+      })
+
+    })
+  </script>
+  <script>
+    $(function() {
+      var areaChartData = {
+        labels: <?php echo json_encode($nombresCentros); ?>,
+        datasets: [{
+          label: 'Gestión Estratégica (30%)',
+          backgroundColor: 'rgba(0, 0, 255, 0.5)',
+          borderColor: 'rgba(0, 0, 255, 1)',
+          borderWidth: 1,
+          data: <?php echo json_encode($promediosCalidad); ?>,
+          fill: false,
+          lineTension: 0
+        }]
+      }
+      var barChartCanvas = $('#estraChart').get(0).getContext('2d')
+      var barChartData = $.extend(true, {}, areaChartData)
+
+      var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false,
+        legend: {
+          display: true,
+        },
+        scales: {
+          xAxes: [{
+            gridLines: {
+              display: false,
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              display: true,
+            }
+          }]
+        },
+
+      }
+      new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+      })
+
+    })
+  </script>
+
+  <script>
+    $(function() {
+      var areaChartData = {
+        labels: <?php echo json_encode($nombresCentros); ?>,
+        datasets: [{
+          label: 'Total Cumplimiento de Gestión (100%)',
+          backgroundColor: 'rgba(255, 17, 0, 1)',
+          borderColor: 'rgba(60,141,188,0.8)',
+          pointRadius: true,
+          pointColor: '#3b8bba',
+          pointStrokeColor: 'rgba(60,141,188,1)',
+          pointHighlightFill: '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data: <?php echo json_encode($totalesCumplimiento); ?>,
+          fill: false,
+          lineTension: 0
+        }]
+      }
+      var barChartCanvas = $('#resaChart').get(0).getContext('2d')
+      var barChartData = $.extend(true, {}, areaChartData)
+
+      var barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false,
+        legend: {
+          display: true,
+        },
+        scales: {
+          xAxes: [{
+            gridLines: {
+              display: false,
+            }
+          }],
+          yAxes: [{
+            gridLines: {
+              display: true,
+            }
+          }]
+        },
+
+      }
+      new Chart(barChartCanvas, {
+        type: 'bar',
+        data: barChartData,
+        options: barChartOptions
+      })
+
+    })
+  </script>
+  <script>
     $(function() {
       $("#example1").DataTable({
         "responsive": true,
@@ -323,8 +774,10 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       } else if (section === 'elimniar') {
         loadContent('admin.php');
       }
+
     });
   </script>
+
 </body>
 
 </html>

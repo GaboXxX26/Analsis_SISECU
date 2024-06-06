@@ -43,7 +43,7 @@ if (!empty($_GET['filterType'])) {
   $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = EXTRACT(YEAR FROM CURRENT_TIMESTAMP)"; // Usar CURRENT_TIMESTAMP
 }
 
-$consulta .= " ORDER BY c.nombre_centro";
+$consulta .= " ORDER BY r.created_at";
 
 $stmt = $pdo->prepare($consulta);
 $stmt->execute($params);
@@ -140,49 +140,83 @@ $stmt->execute($params);
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+            <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
             <li class="nav-item ">
-              <a href="#" class="nav-link ">
+              <a href="./user.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
                 </p>
               </a>
             <li class="nav-item">
-              <a href="user.php" class="nav-link ">
-                <i class="nav-icon far fa-user"></i>
-                <p>Usuarios</p>
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>
+                  Usuario
+                  <i class="right fas fa-angle-left"></i>
+                </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link " onclick="loadContent('admin.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Usuarios</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link" onclick="loadContent('index.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nuevo usuario</p>
+                  </a>
+                </li>
+              </ul>
             </li>
-            <li class="nav-item menu-open">
-              <a href="user.php" class="nav-link">
+            <li class="nav-item">
+              <a href="tabla_admin.php" class="nav-link">
                 <i class="nav-icon fas fa-table"></i>
-                <p>Historico</p>
+                <p>Registros</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="user.php" class="nav-link">
-                <i class="nav-icon fas fa-edit"></i>
-                <p>Nuevo usuario</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="user.php" class="nav-link ">
+              <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                 <i class="nav-icon far fa-plus-square"></i>
                 <p>Cargar Excel</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="user.php" class="nav-link ">
-                <i class="nav-icon fas fa-chart-pie"></i>
-                <p>Resultado</p>
+              <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
+                <i class="nav-icon fas fa-table"></i>
+                <p>Parametrizacion</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="user.php" class="nav-link">
-                <i class="nav-icon fas fa-table"></i>
-                <p>Parametros</p>
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <p>
+                  Estadisticas
+                  <i class="right fas fa-angle-left"></i>
+                </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="./historico.php" class="nav-link" ">
+                    <i class=" far fa-circle nav-icon"></i>
+                    <p>Historico</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./comparativo.php" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Comparativo</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Resultado</p>
+                  </a>
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>
@@ -217,27 +251,22 @@ $stmt->execute($params);
                     <h3 class="card-title">Tabla de Indicadores SIS ECU911</h3>
                   </div>
                   <br>
-                  <div class="container mt-5">
+                  <div class="container mt-5" id="filter-container">
                     <h2 class="mb-4">Filtrar Registros por Mes, Año, Trimestre y Centro</h2>
                     <form id="filterForm" class="mb-4" method="GET">
                       <div class="form-group">
                         <label for="centroSelect">Seleccione un centro:</label>
                         <select id="centroSelect" name="centro" class="form-control" required>
-                          <option value="" disabled selected>Seleccione una centro </option>
-                          <option value="ef48298f-cedf-4718-aa67-b097c80ef23b" <?php echo ($usuario['id_centro'] == 'ef48298f-cedf-4718-aa67-b097c80ef23b') ? 'selected' : ''; ?>>Ambato</option>
-                          <option value="664f5ba3-84e3-40f9-afc3-2fc1a152f88b" <?php echo ($usuario['id_centro'] == '664f5ba3-84e3-40f9-afc3-2fc1a152f88b') ? 'selected' : ''; ?>>Cuenca</option>
-                          <option value="ed587387-5f05-4b86-8bdc-db81d95d5acf" <?php echo ($usuario['id_centro'] == 'ed587387-5f05-4b86-8bdc-db81d95d5acf') ? 'selected' : ''; ?>>Loja</option>
-                          <option value="e9003437-c828-465a-b0ec-b50f7395a2b2" <?php echo ($usuario['id_centro'] == 'e9003437-c828-465a-b0ec-b50f7395a2b2') ? 'selected' : ''; ?>>Esmeraldas</option>
-                          <option value="e3eb2897-7999-4418-bd04-d0a33e3a84f6" <?php echo ($usuario['id_centro'] == 'e3eb2897-7999-4418-bd04-d0a33e3a84f6') ? 'selected' : ''; ?>>Quito</option>
-                          <option value="e1420c15-5f78-4815-8f27-c4df1793bc21" <?php echo ($usuario['id_centro'] == 'e1420c15-5f78-4815-8f27-c4df1793bc21') ? 'selected' : ''; ?>>Babahoyo</option>
-                          <option value="caba5421-1581-49db-a4c2-2a8c3b39d238" <?php echo ($usuario['id_centro'] == 'caba5421-1581-49db-a4c2-2a8c3b39d238') ? 'selected' : ''; ?>>Riobamba</option>
-                          <option value="c9ffaf46-4ba8-4515-aac7-58bdc923f197" <?php echo ($usuario['id_centro'] == 'c9ffaf46-4ba8-4515-aac7-58bdc923f197') ? 'selected' : ''; ?>>Tulcán</option>
-                          <option value="833397ec-c152-40e0-8a3b-536455dd1982" <?php echo ($usuario['id_centro'] == '833397ec-c152-40e0-8a3b-536455dd1982') ? 'selected' : ''; ?>>Machala</option>
-                          <option value="525c8421-6961-47fd-a630-1819594c9ecc" <?php echo ($usuario['id_centro'] == '525c8421-6961-47fd-a630-1819594c9ecc') ? 'selected' : ''; ?>>San Cristóbal</option>
-                          <option value="42a9c5de-2fa9-47cb-9707-a6bade35fdc5" <?php echo ($usuario['id_centro'] == '42a9c5de-2fa9-47cb-9707-a6bade35fdc5') ? 'selected' : ''; ?>>Portoviejo</option>
-                          <option value="2dbf73c0-17f0-44c3-bf3e-6cffe40264d1" <?php echo ($usuario['id_centro'] == '2dbf73c0-17f0-44c3-bf3e-6cffe40264d1') ? 'selected' : ''; ?>>Nueva Loja</option>
-                          <option value="1fb38bb6-59bc-4272-8e08-0dcbf43516dc" <?php echo ($usuario['id_centro'] == '1fb38bb6-59bc-4272-8e08-0dcbf43516dc') ? 'selected' : ''; ?>>Santo Domingo</option>
-                          <option value="054c93ab-fc9c-435f-bf6b-0dabcf4cce5e" <?php echo ($usuario['id_centro'] == '054c93ab-fc9c-435f-bf6b-0dabcf4cce5e') ? 'selected' : ''; ?>>Samborondón</option>
+                          <option value="">Seleccione un centro</option>
+                          <?php
+                          $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
+                          $stmtCentros = $pdo->query($queryCentros);
+
+                          while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
+                            $selected = ($selectedCentro == $rowCentro['id_centro']) ? 'selected' : '';
+                            echo "<option value='{$rowCentro['id_centro']}' $selected>{$rowCentro['nombre_centro']}</option>";
+                          }
+                          ?>
                         </select>
                       </div>
                       <div class="form-group">
@@ -259,7 +288,7 @@ $stmt->execute($params);
                           <tr>
                             <th colspan="2">Datos Generales</th>
                             <th colspan="2">Indicadores de Gestión (20%)</th>
-                            <th colspan="3">Indicadores de Gestión Operativa (100%)</th>
+                            <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
                             <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
                           </tr>
                           <tr>
@@ -303,6 +332,7 @@ $stmt->execute($params);
                       <button type="submit" class="btn btn-primary">Editar</button>
                     </form>
                   </div>
+                  <div id="content-container"></div>
                 </div>
               </div>
             </div>
@@ -372,6 +402,37 @@ $stmt->execute($params);
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
   <!-- Page specific script -->
   <script>
+    function checkContent() {
+      var contentContainer = document.getElementById('content-container');
+      var filterContainer = document.getElementById('filter-container');
+      var chartContainer = document.getElementById('chart-container');
+
+      if (contentContainer.innerHTML.trim() !== '') {
+        filterContainer.style.display = 'none';
+        chartContainer.style.display = 'none';
+      } else {
+        filterContainer.style.display = 'block';
+        chartContainer.style.display = 'block';
+      }
+    }
+
+    // Call checkContent when the page loads
+    window.onload = checkContent;
+
+    // Call checkContent whenever the content of the content-container changes
+    var contentContainerObserver = new MutationObserver(checkContent);
+    contentContainerObserver.observe(document.getElementById('content-container'), {
+      childList: true,
+      subtree: true
+    });
+
+    // Show filter and chart when "Historico" is clicked
+    document.getElementById('historico-link').addEventListener('click', function() {
+      document.getElementById('filter-container').style.display = 'block';
+      document.getElementById('chart-container').style.display = 'block';
+    });
+  </script>
+  <script>
     $(function() {
       $("#example1").DataTable({
         "responsive": false,
@@ -392,6 +453,22 @@ $stmt->execute($params);
         })
         .catch(error => console.error('Error:', error));
     }
+
+    window.addEventListener('load', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+
+      if (section === 'parametro') {
+        loadContent('parametro.php');
+      } else if (section === 'nuevo usuario') {
+        loadContent('index.php');
+      } else if (section === 'editar') {
+        loadContent('admin.php');
+      } else if (section === 'elimniar') {
+        loadContent('admin.php');
+      }
+
+    });
   </script>
   <script>
     document.getElementById('filterTypeSelect').addEventListener('change', function() {

@@ -7,8 +7,8 @@ $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
 
-  header("Location: ../includes/login.php");
-  die();
+    header("Location: ../includes/login.php");
+    die();
 }
 // Verificar si el usuario está activo
 $query = "	SELECT  estado FROM public.user WHERE correo = :correo";
@@ -18,10 +18,10 @@ $stmt->execute();
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$usuario || $usuario['estado'] != 'Activo') {
-  // El usuario no existe o no está activo
-  // Redirigir a una página de error o mostrar un mensaje
-  header("Location: ../views/acceso_denegado.php");
-  die();
+    // El usuario no existe o no está activo
+    // Redirigir a una página de error o mostrar un mensaje
+    header("Location: ../views/acceso_denegado.php");
+    die();
 }
 $query = "SELECT rol_id FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
@@ -33,17 +33,17 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 
 ];
 
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-  die();
+    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+    die();
 }
 
 $id = $_GET['id'];
@@ -120,12 +120,12 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                             </div>
                             <div class="form-group">
                                 <label for="nueva_password">Nueva Contraseña:</label>
-                                <input type="password" name="nueva_password" id="nueva_password" class="form-control" >
+                                <input type="password" name="nueva_password" id="nueva_password" class="form-control">
                             </div>
 
                             <div class="form-group">
                                 <label for="confirmar_password">Confirmar Nueva Contraseña:</label>
-                                <input type="password" name="confirmar_password" id="confirmar_password" class="form-control" >
+                                <input type="password" name="confirmar_password" id="confirmar_password" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label for="rol_id" class="form-label">Rol:</label>
@@ -159,7 +159,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                             </div>
 
                             <div class="form-group">
-                                <label for="estado" class="form-label">Genero:</label>
+                                <label for="estado" class="form-label">Estado:</label>
                                 <select id="estado" name="estado" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" <?php echo $usuario['estado']; ?>>
                                     <option value="Activo" <?php echo ($usuario['estado'] == 'Activo') ? 'selected' : ''; ?>> Activo</option>
                                     <option value="Inactivo" <?php echo ($usuario['estado'] == 'Inactivo') ? 'selected' : ''; ?>>Inactivo</option>
