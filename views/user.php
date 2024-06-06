@@ -38,7 +38,6 @@ $permisos = [
   'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 
 ];
-
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
@@ -85,6 +84,29 @@ if ($stmt->rowCount() > 0) {
     $promediosCalidad[] = $promedio_calidad_formatted;
   }
 }
+
+$query_rol = "SELECT rol FROM permisos WHERE id = :id";
+$stmt_rol = $pdo->prepare($query_rol);
+$stmt_rol->bindParam(':id', $_SESSION['rol_id']);
+$stmt_rol->execute();
+$rol = $stmt_rol->fetch(PDO::FETCH_ASSOC)['rol'];
+
+$query_nombre_apellido = "SELECT nombre, apellido FROM public.user WHERE correo = :correo";
+$stmt_nombre_apellido = $pdo->prepare($query_nombre_apellido);
+$stmt_nombre_apellido->bindParam(':correo', $validar);
+$stmt_nombre_apellido->execute();
+$datos_usuario = $stmt_nombre_apellido->fetch(PDO::FETCH_ASSOC);
+
+$nombre_usuario = $datos_usuario['nombre'];
+$apellido_usuario = $datos_usuario['apellido'];
+// Consulta para obtener el último registro ingresado
+$query_ultimo_registro = "SELECT MAX(created_at) AS ultima_fecha FROM public.registros";
+$stmt_ultimo = $pdo->query($query_ultimo_registro);
+$ultimo_registro = $stmt_ultimo->fetch(PDO::FETCH_ASSOC);
+
+$fecha_ultima = $ultimo_registro['ultima_fecha'];
+$mes_ultima = date('F', strtotime($fecha_ultima)); // Nombre del mes en inglés
+$anio_ultima = date('Y', strtotime($fecha_ultima));
 
 ?>
 
@@ -168,13 +190,13 @@ if ($stmt->rowCount() > 0) {
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="../dist/img/User.png" class="img-circle elevation-2" alt="User Image">
-          </div>
-          <div class="info">
-            <a href="#" class="d-block">Administrdor</a>
-          </div>
+        <br>
+        <div>
+            <div class="info">
+              <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
+
+              <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
+            </div>
         </div>
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -250,7 +272,7 @@ if ($stmt->rowCount() > 0) {
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+                  <a href="./resultado.php" class="nav-link ">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Resultado</p>
                   </a>
@@ -264,18 +286,8 @@ if ($stmt->rowCount() > 0) {
       <!-- /.sidebar -->
     </aside>
     <!-- Content Wrapper. Contains page content -->
+    <br>
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Administrador</h1>
-            </div><!-- /.col -->
-          </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-      </div>
-      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -286,6 +298,8 @@ if ($stmt->rowCount() > 0) {
                 <div id="chart-container">
                   <div class="card-body">
                     <div class="col-md-12">
+                      <h2> Estadisticas</h2>
+                      <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
                       <div class="card card-success">
                         <div class="card-header">
                           <h3 class="card-title">Resultados Nacionales</h3>
@@ -441,32 +455,32 @@ if ($stmt->rowCount() > 0) {
   <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
   <!-- Page specific script -->
   <script>
-  function checkContent() {
-    var contentContainer = document.getElementById('content-container');
-    var chartContainer = document.getElementById('chart-container');
+    function checkContent() {
+      var contentContainer = document.getElementById('content-container');
+      var chartContainer = document.getElementById('chart-container');
 
-    if (contentContainer.innerHTML.trim() !== '') {
-      chartContainer.style.display = 'none';
-    } else {
-      chartContainer.style.display = 'block';
+      if (contentContainer.innerHTML.trim() !== '') {
+        chartContainer.style.display = 'none';
+      } else {
+        chartContainer.style.display = 'block';
+      }
     }
-  }
 
-  // Call checkContent when the page loads
-  window.onload = checkContent;
+    // Call checkContent when the page loads
+    window.onload = checkContent;
 
-  // Call checkContent whenever the content of the content-container changes
-  var contentContainerObserver = new MutationObserver(checkContent);
-  contentContainerObserver.observe(document.getElementById('content-container'), {
-    childList: true,
-    subtree: true
-  });
+    // Call checkContent whenever the content of the content-container changes
+    var contentContainerObserver = new MutationObserver(checkContent);
+    contentContainerObserver.observe(document.getElementById('content-container'), {
+      childList: true,
+      subtree: true
+    });
 
-  // Show chart container when "Historico" is clicked
-  document.getElementById('historico-link').addEventListener('click', function() {
-    document.getElementById('chart-container').style.display = 'block';
-  });
-</script>
+    // Show chart container when "Historico" is clicked
+    document.getElementById('historico-link').addEventListener('click', function() {
+      document.getElementById('chart-container').style.display = 'block';
+    });
+  </script>
   <script>
     $(function() {
       var areaChartData = {

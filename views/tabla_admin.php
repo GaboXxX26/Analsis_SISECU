@@ -2,6 +2,40 @@
 include "../includes/_db.php";
 session_start();
 error_reporting(0);
+$validar = $_SESSION['correo'];
+
+if ($validar == null || $validar == '') {
+
+    header("Location: ../includes/login.php");
+    die();
+}
+// Verificar si el usuario está activo
+$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$usuario || $usuario['estado'] != 'Activo') {
+    // El usuario no existe o no está activo
+    // Redirigir a una página de error o mostrar un mensaje
+    header("Location: ../views/acceso_denegado.php");
+    die();
+}
+$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$_SESSION['rol_id'] = $usuario['rol_id'];
+
+// Definir permisos por rol
+$permisos = [
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+];
 
 // Obtener el mes, año, trimestre, rango de fechas y centro seleccionados
 $selectedMonth = isset($_GET['month']) ? $_GET['month'] : '';
@@ -47,6 +81,22 @@ $consulta .= " ORDER BY r.created_at";
 
 $stmt = $pdo->prepare($consulta);
 $stmt->execute($params);
+
+$query_rol = "SELECT rol FROM permisos WHERE id = :id";
+$stmt_rol = $pdo->prepare($query_rol);
+$stmt_rol->bindParam(':id', $_SESSION['rol_id']);
+$stmt_rol->execute();
+$rol = $stmt_rol->fetch(PDO::FETCH_ASSOC)['rol'];
+
+$query_nombre_apellido = "SELECT nombre, apellido FROM public.user WHERE correo = :correo";
+$stmt_nombre_apellido = $pdo->prepare($query_nombre_apellido);
+$stmt_nombre_apellido->bindParam(':correo', $validar);
+$stmt_nombre_apellido->execute();
+$datos_usuario = $stmt_nombre_apellido->fetch(PDO::FETCH_ASSOC);
+
+$nombre_usuario = $datos_usuario['nombre'];
+$apellido_usuario = $datos_usuario['apellido'];
+
 ?>
 
 <!DOCTYPE html>
@@ -117,7 +167,6 @@ $stmt->execute($params);
       </div>
     </nav>
     <!-- /.navbar -->
-
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
@@ -128,19 +177,15 @@ $stmt->execute($params);
 
       <!-- Sidebar -->
       <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="../dist/img/User.png" class="img-circle elevation-2" alt="User Image">
-          </div>
+        <br>
+        <div>
           <div class="info">
-            <a href="#" class="d-block">Administrdor</a>
+            <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
+            <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
           </div>
         </div>
-        <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
             <li class="nav-item ">
               <a href="./user.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -226,18 +271,8 @@ $stmt->execute($params);
     </aside>
 
     <!-- Content Wrapper. Contains page content -->
+    <br>
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Administrador</h1>
-            </div><!-- /.col -->
-          </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-      </div>
-
       <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
@@ -247,12 +282,8 @@ $stmt->execute($params);
               <div class="card">
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <div class="card-header">
-                    <h3 class="card-title">Tabla de Indicadores SIS ECU911</h3>
-                  </div>
-                  <br>
                   <div class="container mt-5" id="filter-container">
-                    <h2 class="mb-4">Filtrar Registros por Mes, Año, Trimestre y Centro</h2>
+                    <h2 class="mb-4">Filtro de registros por centro</h2>
                     <form id="filterForm" class="mb-4" method="GET">
                       <div class="form-group">
                         <label for="centroSelect">Seleccione un centro:</label>
@@ -283,7 +314,7 @@ $stmt->execute($params);
                       <button type="submit" class="btn btn-primary">Filtrar</button>
                     </form>
                     <form action="../includes/_functions.php" method="POST">
-                      <table id="example1" class="table table-bordered table-striped table-responsive ">
+                      <table id="example1" class="table table-bordered table-striped table-responsive">
                         <thead>
                           <tr>
                             <th colspan="2">Datos Generales</th>
@@ -343,7 +374,7 @@ $stmt->execute($params);
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+      <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
     </footer>
     <!-- Control Sidebar -->
@@ -439,7 +470,7 @@ $stmt->execute($params);
         "lengthChange": true,
         "autoWidth": true,
         "scrollX": true,
-        "buttons": ["copy", "excel", "pdf", "print", "colvis"]
+
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
   </script>

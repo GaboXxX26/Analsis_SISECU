@@ -50,26 +50,49 @@ if ($validar == null || $validar == '') {
           echo "<td>" . $row['nombre_centro'] . "</td>";
           echo "<td>" . $row['rol'] . "</td>";
           echo '<td>        
-                <a class="btn btn-app" href="editar_user.php?id=' . $row['id'] . '" > 
-                <i class="fas fa-edit"></i>Editar</a>
-                <a class="btn btn-app" href="eliminar_user.php?id=' . $row['id'] . '" >
-                <i class="fas fa-trash"></i> Desactivar </a>
-              </td>';
+          <a class="btn btn-app" href="javascript:void(0);" onclick="loadContent(\'editar_user.php?id=' . $row['id'] . '\')"> 
+          <i class="fas fa-edit"></i>Editar</a>
+          <a class="btn btn-app" href="javascript:void(0);" onclick="loadContent(\'eliminar_user.php?id=' . $row['id'] . '\')">
+          <i class="fas fa-trash"></i> Desactivar </a>
+        </td>';
           echo "</tr>\n";
         }
       } else {
 
       ?>
         <tr class=" text-center">
-      <td colspan="16">No existen registros</td>
-      </tr>
-    <?php
+    <td colspan="16">No existen registros</td>
+    </tr>
+  <?php
       }
-    ?>
-    </tbody>
+  ?>
+  </tbody>
   </table>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  function loadContent(url) {
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('content-container').innerHTML = data;
+      })
+      .catch(error => console.error('Error:', error));
+  }
 
+  window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section');
+
+    if (section === 'parametro') {
+      loadContent('parametro.php');
+    } else if (section === 'nuevo usuario') {
+      loadContent('index.php');
+    } else if (section === 'editar') {
+      loadContent('admin.php');
+    } else if (section === 'elimniar') {
+      loadContent('admin.php');
+    }
+
+  });
 </script>

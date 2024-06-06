@@ -7,8 +7,8 @@ $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
 
-  header("Location: ./includes/login.php");
-  die();
+    header("Location: ./includes/login.php");
+    die();
 }
 ?>
 <form action="../includes/validar.php" method="POST">

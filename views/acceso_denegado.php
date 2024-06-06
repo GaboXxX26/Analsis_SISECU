@@ -36,7 +36,7 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad SIS ECU911</a>.</strong> Todos los derechos reservados
+    <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad SIS ECU911</a>.</strong> Todos los derechos reservados
   </footer>
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">

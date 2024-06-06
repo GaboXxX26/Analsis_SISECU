@@ -378,7 +378,7 @@ $stmt->execute($params);
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+            <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
             Todos los derechos reservados.
         </footer>
         <!-- Control Sidebar -->

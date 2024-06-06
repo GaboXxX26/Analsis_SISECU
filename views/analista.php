@@ -33,22 +33,23 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php','tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'=>['analista.php']
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+  'e17a74c4-9627-443c-b020-23dc4818b718' => ['user.php', 'tabla_admin.php'],
+  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php']
 
 ];
 
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-    die();
+  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+  die();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -137,8 +138,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
               <a href="analista.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -156,7 +155,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+              <a href="./resultado.php" class="nav-link ">
                 <i class="nav-icon fas fa-chart-pie"></i>
                 <p>Resultado</p>
               </a>
@@ -167,21 +166,8 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       </div>
       <!-- /.sidebar -->
     </aside>
-
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Analista</h1>
-            </div><!-- /.col -->
-          </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-      </div>
-
-      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -201,7 +187,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+      <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
     </footer>
     <!-- Control Sidebar -->

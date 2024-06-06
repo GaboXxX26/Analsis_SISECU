@@ -33,22 +33,47 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php','tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'=>['analista.php']
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
+  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 
 ];
 
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-    die();
+  header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
+  die();
 }
+
+$query_rol = "SELECT rol FROM permisos WHERE id = :id";
+$stmt_rol = $pdo->prepare($query_rol);
+$stmt_rol->bindParam(':id', $_SESSION['rol_id']);
+$stmt_rol->execute();
+$rol = $stmt_rol->fetch(PDO::FETCH_ASSOC)['rol'];
+
+$query_nombre_apellido = "SELECT nombre, apellido FROM public.user WHERE correo = :correo";
+$stmt_nombre_apellido = $pdo->prepare($query_nombre_apellido);
+$stmt_nombre_apellido->bindParam(':correo', $validar);
+$stmt_nombre_apellido->execute();
+$datos_usuario = $stmt_nombre_apellido->fetch(PDO::FETCH_ASSOC);
+
+$nombre_usuario = $datos_usuario['nombre'];
+$apellido_usuario = $datos_usuario['apellido'];
+// Consulta para obtener el último registro ingresado
+$query_ultimo_registro = "SELECT MAX(created_at) AS ultima_fecha FROM public.registros";
+$stmt_ultimo = $pdo->query($query_ultimo_registro);
+$ultimo_registro = $stmt_ultimo->fetch(PDO::FETCH_ASSOC);
+
+$fecha_ultima = $ultimo_registro['ultima_fecha'];
+$mes_ultima = date('F', strtotime($fecha_ultima)); // Nombre del mes en inglés
+$anio_ultima = date('Y', strtotime($fecha_ultima));
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -126,12 +151,12 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
       <!-- Sidebar -->
       <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="../dist/img/User.png" class="img-circle elevation-2" alt="User Image">
-          </div>
+        <br>
+        <div>
           <div class="info">
-            <a href="#" class="d-block">Usuario</a>
+            <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
+
+            <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
           </div>
         </div>
         <!-- Sidebar Menu -->
@@ -139,36 +164,16 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
             <li class="nav-item menu-open">
-              <a href="analista.php" class="nav-link ">
+              <a href="lector.php" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Inicio
                 </p>
               </a>
-              <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('usurio.php')">
-                <i class="nav-icon far fa-user"></i>
-                <p>Usuarios</p>
-              </a>
-            </li>
             <li class="nav-item">
-              <a href="tabla_user.php" class="nav-link" >
-                <i class="nav-icon fas fa-table"></i>
-                <p>
-                  Indicadores
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
-                <i class="nav-icon far fa-plus-square"></i>
-                <p>Cargar Excel</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link " onclick="loadContent('chart.php')">
+              <a href="./resultado.php" class="nav-link ">
                 <i class="nav-icon fas fa-chart-pie"></i>
-                <p>Resultado</p>
+                <p>Estadisticas</p>
               </a>
             </li>
           </ul>
@@ -180,18 +185,6 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">Usuario</h1>
-            </div><!-- /.col -->
-          </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-      </div>
-
-      <!-- /.content-header -->
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -211,7 +204,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2021 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+      <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
     </footer>
     <!-- Control Sidebar -->
