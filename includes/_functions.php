@@ -168,9 +168,9 @@ function acceso_user()
                 if ($fila['rol_id'] == 'add38db6-1687-4e57-a763-a959400d9da2') { // Admin
                     header('Location: ../views/user.php');
                 } elseif ($fila['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718') { // Usuario
-                    header('Location: ../views/lector.php');
+                    header('Location: ../views/user.php');
                 } elseif ($fila['rol_id'] == 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6') { // Analista de Datos
-                    header('Location: ../views/analista.php');
+                    header('Location: ../views/user.php');
                 }
             } else {
                 $_SESSION['error_login'] = "Usuario o contraseña incorrectos.";

@@ -34,8 +34,8 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 // Definir permisos por rol
 $permisos = [
     'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php', 'historico.php', 'comparativo.php']
 
 ];
 
@@ -250,84 +250,211 @@ $apellido_usuario = $datos_usuario['apellido'];
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon classwith font-awesome or any other icon font library -->
-                        <li class="nav-item ">
-                            <a href="./user.php" class="nav-link ">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Inicio
-                                </p>
-                            </a>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-chart-pie"></i>
-                                <p>
-                                    Usuario
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
+                        <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+                        <?php
+                        // Obtener el ID de rol del usuario de la sesión
+                        $rol_id = $_SESSION['rol_id'];
+
+                        // Definir las opciones de navegación según el rol
+                        switch ($rol_id) {
+                            case 'add38db6-1687-4e57-a763-a959400d9da2': // Administrador
+                        ?>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link " onclick="loadContent('admin.php')">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Usuarios</p>
+                                    <a href="./user.php" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Inicio
+                                        </p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadContent('index.php')">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Nuevo usuario</p>
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-pie"></i>
+                                        <p>
+                                            Usuario
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
                                     </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link" onclick="loadContent('admin.php')">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Usuarios</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link" onclick="loadContent('index.php')">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Nuevo usuario</p>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="tabla_admin.php" class="nav-link">
-                                <i class="nav-icon fas fa-table"></i>
-                                <p>Registros</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
-                                <i class="nav-icon far fa-plus-square"></i>
-                                <p>Cargar Excel</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
-                                <i class="nav-icon fas fa-table"></i>
-                                <p>Parametrizacion</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-chart-pie"></i>
-                                <p>
-                                    Estadisticas
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="./historico.php" class="nav-link" ">
-                                        <i class=" far fa-circle nav-icon"></i>
-                                        <p>Historico</p>
+                                    <a href="tabla_admin.php" class="nav-link">
+                                        <i class="nav-icon fas fa-table"></i>
+                                        <p>Registros</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./comparativo.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Comparativo</p>
+                                    <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
+                                        <i class="nav-icon far fa-plus-square"></i>
+                                        <p>Cargar Excel</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./resultado.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Resultado</p>
+                                    <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
+                                        <i class="nav-icon fas fa-table"></i>
+                                        <p>Parametrizacion</p>
                                     </a>
                                 </li>
-                            </ul>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-pie"></i>
+                                        <p>
+                                            Estadisticas
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="./historico.php" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Historico</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./comparativo.php" class="nav-link" id="historico-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Comparativo</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./resultado.php" class="nav-link ">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Resultado</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            <?php
+                                break;
+                            case 'e17a74c4-9627-443c-b020-23dc4818b718': // Visualizador
+                            ?>
+                                <li class="nav-item">
+                                    <a href="./user.php" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Inicio
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-pie"></i>
+                                        <p>
+                                            Estadisticas
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="./historico.php" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Historico</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./comparativo.php" class="nav-link" id="historico-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Comparativo</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./resultado.php" class="nav-link ">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Resultado</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            <?php
+                                break;
+                            case 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6': // Analista de datos
+                            ?>
+
+                                <li class="nav-item">
+                                    <a href="./user.php" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Inicio
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="tabla_admin.php" class="nav-link">
+                                        <i class="nav-icon fas fa-table"></i>
+                                        <p>Registros</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
+                                        <i class="nav-icon far fa-plus-square"></i>
+                                        <p>Cargar Excel</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link " onclick="loadContent('parametro.php')">
+                                        <i class="nav-icon fas fa-table"></i>
+                                        <p>Parametrizacion</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-pie"></i>
+                                        <p>
+                                            Estadisticas
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="./historico.php" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Historico</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./comparativo.php" class="nav-link" id="historico-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Comparativo</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="./resultado.php" class="nav-link ">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Resultado</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            <?php
+                                break;
+                            default:
+                                // No se encontró un rol válido
+                            ?>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-exclamation-circle"></i>
+                                        <p>
+                                            Rol no válido
+                                        </p>
+                                    </a>
+                                </li>
+                        <?php
+                        }
+                        ?>
+
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->

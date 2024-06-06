@@ -261,7 +261,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                             case 'e17a74c4-9627-443c-b020-23dc4818b718': // Visualizador
                             ?>
                                 <li class="nav-item">
-                                    <a href="./lector.php" class="nav-link">
+                                    <a href="./user.php" class="nav-link">
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
                                             Inicio
@@ -303,7 +303,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                             ?>
 
                                 <li class="nav-item">
-                                    <a href="./analista.php" class="nav-link">
+                                    <a href="./user.php" class="nav-link">
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
                                             Inicio
