@@ -202,7 +202,7 @@ function solicitar_recuperacion()
             $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";
 
             list($encryptedPassword, $iv) = explode('::', base64_decode($usuario['password']), 2); // Desencriptar la contraseña
-            $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv); //decencriptar la clave, NORMA POCO SEGURA
+            $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv); 
 
             $asunto = "Recuperacion de clave del Cuadro de Mando y Gestion";
             $mensaje = "Tu clave es: " . $password;

@@ -3,54 +3,13 @@ include "../includes/_db.php";
 session_start();
 error_reporting(0);
 
-$validar = $_SESSION['correo'];
 
-if ($validar == null || $validar == '') {
-
-    header("Location: ../includes/login.php");
-    die();
-}
-// Verificar si el usuario está activo
-$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$usuario || $usuario['estado'] != 'Activo') {
-    // El usuario no existe o no está activo
-    // Redirigir a una página de error o mostrar un mensaje
-    header("Location: ../views/acceso_denegado.php");
-    die();
-}
-$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':correo', $validar);
-$stmt->execute();
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$_SESSION['rol_id'] = $usuario['rol_id'];
-
-// Definir permisos por rol
-$permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php', 'historico.php', 'comparativo.php']
-
-];
-
-// Verificar si el usuario tiene permiso para la página actual
-$pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
-if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
-    header("Location: ../views/acceso_denegado.php"); // O redirige a la página adecuada
-    die();
-}
+// Obtener los filtros seleccionados
 // Obtener los filtros seleccionados
 $selectedCentros = isset($_GET['centros']) ? $_GET['centros'] : [];
 $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
 $fechaInicio = isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
 $fechaFin = isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
-
 
 // Obtener el nombre del centro seleccionado
 $nombreCentro = '';
@@ -474,87 +433,88 @@ $apellido_usuario = $datos_usuario['apellido'];
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <br>
-                                    <div class="container mt-12">
-                                        <h1> Filtro comparativo de centros</h1>
-                                        <?php
-                                        $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
-                                        ?>
-                                        <div class="col-md-3" id="filter-container">
-                                            <form id="filterForm" class="mb-2" method="GET">
-                                                <div class="form-group">
-                                                    <label for="centroSelect">Seleccione uno o más centros:</label>
-                                                    <div class="form-check">
-                                                        <?php
-                                                        $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
-                                                        $stmtCentros = $pdo->query($queryCentros);
-                                                        while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
-                                                            echo "<input type='checkbox' id='centroSelect_{$rowCentro['id_centro']}' name='centros[]' value='{$rowCentro['id_centro']}'>";
-                                                            echo "<label for='centroSelect_{$rowCentro['id_centro']}'>{$rowCentro['nombre_centro']}</label><br>";
-                                                        }
-                                                        ?>
-                                                    </div>
-                                                    <label for="fechaInicio">Fecha de inicio:</label>
-                                                    <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?= isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '' ?>">
-                                                    <label for="fechaFin">Fecha de fin:</label>
-                                                    <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?= isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '' ?>">
+
+                                    <h1> Filtro comparativo de centros</h1>
+                                    <?php
+                                    $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
+                                    ?>
+                                    <div class="col-md-3" id="filter-container">
+                                        <form id="filterForm" class="mb-2" method="GET">
+                                            <div class="form-group">
+                                                <label for="centroSelect">Seleccione un centro:</label>
+                                                <label for="centroSelect" style>Seleccione 7 centros:</label>
+                                                <div class="form-check">
+                                                    <?php
+                                                    // Realizar la consulta para obtener los centros
+                                                    $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
+                                                    $stmtCentros = $pdo->query($queryCentros);
+
+                                                    // Iterar sobre los resultados y generar los checkboxes
+                                                    while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
+                                                        // Determinar si el checkbox debe estar marcado
+                                                        $checked = in_array($rowCentro['id_centro'], $selectedCentros) ? 'checked' : '';
+                                                        echo "<input type='checkbox' id='centroSelect_{$rowCentro['id_centro']}' name='centros[]' value='{$rowCentro['id_centro']}' $checked>";
+                                                        echo "<label for='centroSelect_{$rowCentro['id_centro']}'> {$rowCentro['nombre_centro']}</label><br>";
+                                                    }
+                                                    ?>
                                                 </div>
-                                                <div id="filtrosAdicionales" class="form-group">
-                                                </div>
-                                                <button type="submit" class="btn btn-primary">Filtrar</button>
-                                                <?php if ($hayFiltrosIngresados) : ?>
-                                                    <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
-                                                <?php endif; ?>
-                                            </form>
-                                        </div>
-                                        <div id="chart-container">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="card card-success">
-                                                        <div class="card-header">
-                                                            <h3 class="card-title">Indicadores Gestion 20% </h3>
-                                                            <div class="card-tools">
-                                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                                    <i class="fas fa-minus"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="chart">
-                                                                <canvas id="gestionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card card-success">
-                                                        <div class="card-header">
-                                                            <h3 class="card-title">Indicadores de gestion de calidad(30%)</h3>
-                                                            <div class="card-tools">
-                                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                                    <i class="fas fa-minus"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="chart">
-                                                                <canvas id="calidadChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                            </div>
-                                                        </div>
+                                                <label for="fechaInicio">Fecha de inicio:</label>
+                                                <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?= isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '' ?>">
+                                                <label for="fechaFin">Fecha de fin:</label>
+                                                <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?= isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '' ?>">
+                                            </div>
+                                            <div id="filtrosAdicionales" class="form-group">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                                            <?php if ($hayFiltrosIngresados) : ?>
+                                                <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
+                                            <?php endif; ?>
+                                        </form>
+                                    </div>
+                                    <div id="chart-container">
+                                        <div class="col-md-12">
+                                            <div class="card card-success">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Indicadores Gestion Interinstitucional 20% </h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="card card-success">
-                                                        <div class="card-header">
-                                                            <h3 class="card-title">Indicadores de gestion operativa (50%) </h3>
-                                                            <div class="card-tools">
-                                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                                    <i class="fas fa-minus"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="chart">
-                                                                <canvas id="operativaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                            </div>
-                                                        </div>
+                                                <div class="card-body">
+                                                    <div class="chart">
+                                                        <canvas id="gestionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card card-success">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Indicadores de gestion operativa (50%)</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="chart">
+                                                        <canvas id="calidadChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card card-success">
+                                                <div class="card-header">
+                                                    <h3 class="card-title"> Indicadores de calidad (30%)</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="chart">
+                                                        <canvas id="operativaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -631,7 +591,30 @@ $apellido_usuario = $datos_usuario['apellido'];
     <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- Page specific script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name="centros[]"]');
+            const maxSelections = 7;
 
+            const updateCheckboxes = () => {
+                const selectedCount = document.querySelectorAll('input[type="checkbox"][name="centros[]"]:checked').length;
+                checkboxes.forEach(box => {
+                    if (!box.checked && selectedCount >= maxSelections) {
+                        box.disabled = true;
+                    } else {
+                        box.disabled = false;
+                    }
+                });
+            };
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateCheckboxes);
+            });
+
+            // Inicialización para bloquear casillas si ya hay 7 seleccionadas al cargar la página
+            updateCheckboxes();
+        });
+    </script>
     <script>
         function checkContent() {
             var contentContainer = document.getElementById('content-container');
@@ -731,7 +714,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                     };
 
                     new Chart(chartCanvas, {
-                        type: 'line',
+                        type: 'bar',
                         data: chartData,
                         options: chartOptions
                     });

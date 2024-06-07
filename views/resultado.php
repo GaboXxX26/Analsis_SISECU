@@ -47,19 +47,22 @@ $fecha_ultima = $ultimo_registro['ultima_fecha'];
 $mes_ultima = date('F', strtotime($fecha_ultima)); // Nombre del mes en inglés
 $anio_ultima = date('Y', strtotime($fecha_ultima));
 
-$consulta = "SELECT c.nombre_centro, 
-SUM(r.conve_stra) AS suma_conve_stra, 
-SUM(r.comp_insti) AS suma_comp_insti,
-SUM(r.opera_cam) AS suma_opera_cam,
-SUM(r.ausentimo) AS suma_ausentimo,
-SUM(r.mobile_locator) AS suma_mobile_locator,
-SUM(r.dispoci) AS suma_dispoci,
-SUM(r.com_estra) AS suma_com_estra,
-COUNT(*) AS num_repeticiones
-FROM public.registros AS r 
-LEFT JOIN centro as c ON c.id_centro = r.id_centro
-GROUP BY c.nombre_centro
-ORDER BY c.nombre_centro";
+$consulta = "SELECT c.nombre_centro,
+                    r.conve_stra,
+                    r.comp_insti,
+                    r.opera_cam,
+                    r.ausentimo,
+                    r.mobile_locator,
+                    r.dispoci,
+                    r.com_estra
+            FROM public.registros AS r
+            LEFT JOIN centro AS c ON c.id_centro = r.id_centro
+            WHERE r.created_at = (
+                SELECT MAX(created_at)
+                FROM public.registros r2
+                WHERE r2.id_centro = r.id_centro
+            )
+            ORDER BY c.nombre_centro";
 $stmt = $pdo->query($consulta);
 
 
@@ -420,6 +423,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                         <div class="container mt-12">
                                             <h2> Estadisticas</h2>
                                             <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                                            
                                             <table id="example1" class="table table-bordered table-hover table-responsive">
                                                 <thead>
                                                     <tr>
@@ -432,12 +436,18 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    require_once '../includes/_db.php';
 
                                                     // Obtener los parámetros ordenados por valor descendente
                                                     $consulta_parametros = "SELECT parametro, color FROM public.parametros ORDER BY parametro DESC";
                                                     $stmt_parametros = $pdo->query($consulta_parametros);
                                                     $parametros = $stmt_parametros->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    // Inicializar variables para los totales nacionales
+                                                    $total_gestion = 0;
+                                                    $total_operativa = 0;
+                                                    $total_calidad = 0;
+                                                    $total_cumplimiento_gestion = 0; // Variable para el total cumplimiento de gestión
+                                                    $total_centros = 0;
 
                                                     if ($stmt->rowCount() > 0) {
                                                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -445,9 +455,10 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                             echo "<td>" . $row['nombre_centro'] . "</td>";
 
                                                             // Calcular los promedios sin multiplicar por los porcentajes
-                                                            $promedio_gestion = ($row['suma_conve_stra'] + $row['suma_comp_insti']) / $row['num_repeticiones'];
-                                                            $promedio_operativa = ($row['suma_opera_cam'] + $row['suma_ausentimo'] + $row['suma_mobile_locator']) / $row['num_repeticiones'];
-                                                            $promedio_calidad = ($row['suma_dispoci'] + $row['suma_com_estra']) / $row['num_repeticiones'];
+                                                            $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
+                                                            $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
+                                                            $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
+                                                        
 
                                                             $promedio_gestion_formatted = number_format($promedio_gestion, 2);
                                                             $promedio_operativa_formatted = number_format($promedio_operativa, 2);
@@ -459,6 +470,13 @@ $apellido_usuario = $datos_usuario['apellido'];
 
                                                             // Calcular la suma total del centro
                                                             $suma_total_centro = $promedio_gestion + $promedio_operativa + $promedio_calidad;
+
+                                                            // Sumar los valores a los totales nacionales
+                                                            $total_gestion += $promedio_gestion;
+                                                            $total_operativa += $promedio_operativa;
+                                                            $total_calidad += $promedio_calidad;
+                                                            $total_cumplimiento_gestion += $suma_total_centro;
+                                                            $total_centros++;
 
                                                             // Aplicar color de fondo según el valor del total
                                                             $color_fondo = '';
@@ -480,6 +498,20 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                             echo "<td style='background-color: " . $color_fondo . "'>" . number_format($suma_total_centro, 2) . "</td>";
                                                             echo "</tr>\n";
                                                         }
+
+                                                        // Calcular los promedios nacionales
+                                                        $promedio_nacional_gestion = $total_gestion / $total_centros;
+                                                        $promedio_nacional_operativa = $total_operativa / $total_centros;
+                                                        $promedio_nacional_calidad = $total_calidad / $total_centros;
+                                                        $promedio_nacional_cumplimiento_gestion = $total_cumplimiento_gestion / $total_centros; // Promedio nacional de cumplimiento de gestión
+
+                                                        echo "<tr style='font-weight: bold;'>";
+                                                        echo "<td>Valoración nacional</td>";
+                                                        echo "<td>" . number_format($promedio_nacional_gestion, 2) . "</td>";
+                                                        echo "<td>" . number_format($promedio_nacional_operativa, 2) . "</td>";
+                                                        echo "<td>" . number_format($promedio_nacional_calidad, 2) . "</td>";
+                                                        echo "<td>" . number_format($promedio_nacional_cumplimiento_gestion, 2) . "</td>"; // Columna de cumplimiento de gestión
+                                                        echo "</tr>\n";
                                                     } else {
                                                     ?>
                                                         <tr class="text-center">
@@ -597,8 +629,9 @@ $apellido_usuario = $datos_usuario['apellido'];
         $(function() {
             $("#example1").DataTable({
                 "responsive": true,
-                "lengthChange": true,
+                "lengthChange": false,
                 "autoWidth": false,
+                "paging": false,
                 "buttons": ["copy", "excel", "pdf", "print"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });

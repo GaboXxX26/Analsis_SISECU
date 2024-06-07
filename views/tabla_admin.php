@@ -471,13 +471,13 @@ $apellido_usuario = $datos_usuario['apellido'];
                               echo "<td>" . $row['nombre_centro'] . "</td>";
                               // Campos con nombres de array y valores precargados
                               echo "<input type='hidden' name='id_registro[]' value='" . $row['id_registro'] . "'>";
-                              echo "<td><input type='number' name='conve_stra[]' value='" . $row['conve_stra'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='comp_insti[]' value='" . $row['comp_insti'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='opera_cam[]' value='" . $row['opera_cam'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='ausentimo[]' value='" . $row['ausentimo'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='mobile_locator[]' value='" . $row['mobile_locator'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='dispoci[]' value='" . $row['dispoci'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' name='com_estra[]' value='" . $row['com_estra'] . "' min='0' max='100'step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='conve_stra[]' value='" . $row['conve_stra'] . "' min='0' max='10' step='0.01' ></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='comp_insti[]' value='" . $row['comp_insti'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='opera_cam[]' value='" . $row['opera_cam'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='ausentimo[]' value='" . $row['ausentimo'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none'name='mobile_locator[]' value='" . $row['mobile_locator'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='dispoci[]' value='" . $row['dispoci'] . "' min='0' max='100' step='0.01'></td>";
+                              echo "<td><input type='number' style='background-color:transparent; border:none' name='com_estra[]' value='" . $row['com_estra'] . "' min='0' max='100'step='0.01'></td>";
 
                               echo "</tr>\n";
                             }

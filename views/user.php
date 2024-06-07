@@ -38,6 +38,7 @@ $permisos = [
   'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php']
 
 ];
+
 // Verificar si el usuario tiene permiso para la página actual
 $pagina_actual = basename($_SERVER['PHP_SELF']); // Obtiene el nombre del archivo actual
 if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
@@ -63,26 +64,84 @@ $consulta = "SELECT c.nombre_centro,
             ORDER BY c.nombre_centro";
 $stmt = $pdo->query($consulta);
 
+$total_gestion = 0;
+$total_operativa = 0;
+$total_calidad = 0;
+$total_cumplimiento_gestion = 0;
+$total_centros = 0;
+
+$nombresCentros = [];
+$totalesCumplimiento = [];
+$promediosGestion = [];
+$promediosOperativa = [];
+$promediosCalidad = [];
+
+$totalConveStra = 0;
+$totalCompInsti = 0;
+$totaloperacam = 0;
+$totalausentimo = 0;
+$totalmobilelocator = 0;
+$totaldispoci = 0;
+$totalcomestra = 0;
+
 if ($stmt->rowCount() > 0) {
   while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
-    // Calcular los promedios sin multiplicar por los porcentajes
+    $totalConveStra += $row['conve_stra'];
+    $totalCompInsti += $row['comp_insti'];
+    $totaloperacam += $row['opera_cam'];
+    $totalausentimo += $row['ausentimo'];
+    $totalmobilelocator += $row['mobile_locator'];
+    $totaldispoci += $row['dispoci'];
+    $totalcomestra += $row['com_estra'];
+
     $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
     $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
     $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
 
+    // Formatear los promedios
     $promedio_gestion_formatted = number_format($promedio_gestion, 2);
     $promedio_operativa_formatted = number_format($promedio_operativa, 2);
     $promedio_calidad_formatted = number_format($promedio_calidad, 2);
 
     // Calcular la suma total del centro
     $suma_total_centro = $promedio_gestion + $promedio_operativa + $promedio_calidad;
+
+    // Sumar los promedios al total nacional
+    $total_gestion += $promedio_gestion;
+    $total_operativa += $promedio_operativa;
+    $total_calidad += $promedio_calidad;
+    $total_cumplimiento_gestion += $suma_total_centro;
+    $total_centros++;
+
+    // Almacenar los datos de cada centro
     $nombresCentros[] = $row['nombre_centro'];
-    $totalesCumplimiento[] = number_format($suma_total_centro, 2); // Formatear a 2 decimales
+    $totalesCumplimiento[] = number_format($suma_total_centro, 2);
     $promediosGestion[] = $promedio_gestion_formatted;
     $promediosOperativa[] = $promedio_operativa_formatted;
     $promediosCalidad[] = $promedio_calidad_formatted;
   }
+
+  // calcular los vlaores simples 
+  $promedioConveStra = $totalConveStra / 16;
+  $promedioCompInsti = $totalCompInsti / 16;
+  $promediooperacam = $totaloperacam / 16;
+  $promedioausentimo = $totalausentimo / 16;
+  $promediomobilelocator = $totalmobilelocator / 16;
+  $promediodispoci = $totaldispoci / 16;
+  $promediocomestra = $totalcomestra / 16;
+
+  // Calcular los promedios nacionales
+  $promedio_nacional_gestion = $total_gestion / $total_centros;
+  $promedio_nacional_operativa = $total_operativa / $total_centros;
+  $promedio_nacional_calidad = $total_calidad / $total_centros;
+  $promedio_nacional_cumplimiento_gestion = $total_cumplimiento_gestion / $total_centros;
+
+  // Formatear los promedios nacionales para los gráficos
+  $promNacionalGestion = number_format($promedio_nacional_gestion, 2);
+  $promNacionalOperativa = number_format($promedio_nacional_operativa, 2);
+  $promNacionalCalidad = number_format($promedio_nacional_calidad, 2);
+  $promNacionalCumplimiento = number_format($promedio_nacional_cumplimiento_gestion, 2);
 }
 
 $query_rol = "SELECT rol FROM permisos WHERE id = :id";
@@ -425,8 +484,117 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                 <div id="chart-container">
                   <div class="card-body">
                     <div class="col-md-12">
-                      <h2> Estadisticas</h2>
+                      <h2> Informacion estadistica</h2>
                       <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="card card-success" style="height:25rem;">
+                            <div class="card-header">
+                              <h3 class="card-title">Interinstitucional (20%)</h3>
+                              <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                  <i class="fas fa-minus"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="card-body">
+                              <div class="chart">
+                                <canvas id="intChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                <h2 class="text-center"><?php echo $promNacionalGestion; ?>%</h2>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6" style="border:inset; height:8.44rem;">
+                              <p style="text-align:center;">Convenios Estrategicos Respotados (10%):</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioConveStra, 2)); ?> %</h4>
+                            </div>
+                            <div class="col-md-6" style="border:inset;">
+                              <p style="text-align:center;">Compromisos intitucionales cumplidos (10%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioCompInsti, 2)); ?> %</h4>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="card card-success" style="height:25rem;">
+                            <div class="card-header">
+                              <h3 class="card-title">Operativa (50%)</h3>
+                              <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                  <i class="fas fa-minus"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="card-body">
+                              <div class="chart">
+                                <canvas id="opeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                <h1 class="text-center"><?php echo $promNacionalOperativa; ?>%</h1>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-4" style="border:inset; height:8.44rem; "">
+                              <p style=" text-align:center;">Operatividad de camaras (20%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediooperacam, 2)); ?> %</h4>
+                            </div>
+                            <div class="col-md-4" style="border:inset;">
+                              <p style="text-align:center;">Ausentismo Operativo (20%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioausentimo, 2)); ?> %</h4>
+                            </div>
+                            <div class="col-md-4" style="border:inset;">
+                              <p style="text-align:center;">Cumplimiento Movile Locator (10%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediomobilelocator, 2)); ?> %</h4>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="card card-success" style="height:25rem;">
+                            <div class="card-header">
+                              <h3 class="card-title ">Estratégica (30%)</h3>
+                              <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                  <i class="fas fa-minus"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="card-body">
+                              <div class="chart">
+                                <canvas id="estraChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                <h2 class="text-center"><?php echo $promNacionalCalidad; ?>%</h2>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6" style="border:inset; height:8.44rem;">
+                              <p style="text-align:center;">Incumplimiento de disposiciones (20%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediodispoci, 2)); ?> %</h4>
+                            </div>
+                            <div class="col-md-6" style="border:inset;">
+                              <p style="text-align:center;">Comunicacion estrategica(10%)</p>
+                              <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediocomestra, 2)); ?> %</h4>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="col-md-12">
+                        <div class="card card-success">
+                          <div class="card-header">
+                            <h3 class="card-title">Total Nacional (100%)</h3>
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="chart">
+                              <canvas id="nacionalChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                              <h2 class="text-center"><?php echo $promNacionalCumplimiento; ?>%</h2>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div class="card card-success">
                         <div class="card-header">
                           <h3 class="card-title">Resultados Nacionales</h3>
@@ -442,70 +610,18 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="card card-success">
-                          <div class="card-header">
-                            <h3 class="card-title">Gestión Interinstitucional</h3>
-                            <div class="card-tools">
-                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div class="card-body">
-                            <div class="chart">
-                              <canvas id="intChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
+                      <div class="card card-success">
+                        <div class="card-header">
+                          <h3 class="card-title">Total Cumplimiento de Gestión</h3>
+                          <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                              <i class="fas fa-minus"></i>
+                            </button>
                           </div>
                         </div>
-
-                        <div class="card card-success">
-                          <div class="card-header">
-                            <h3 class="card-title">Gestión Operativa</h3>
-                            <div class="card-tools">
-                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div class="card-body">
-                            <div class="chart">
-                              <canvas id="opeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="card card-success">
-                          <div class="card-header">
-                            <h3 class="card-title">Gestión Estratégica</h3>
-                            <div class="card-tools">
-                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div class="card-body">
-                            <div class="chart">
-                              <canvas id="estraChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card card-success">
-                          <div class="card-header">
-                            <h3 class="card-title">Total Cumplimiento de Gestión</h3>
-                            <div class="card-tools">
-                              <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div class="card-body">
-                            <div class="chart">
-                              <canvas id="resaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                            </div>
+                        <div class="card-body">
+                          <div class="chart">
+                            <canvas id="resaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                           </div>
                         </div>
                       </div>
@@ -685,141 +801,113 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
   </script>
   <script>
     $(function() {
-      var areaChartData = {
-        labels: <?php echo json_encode($nombresCentros); ?>,
+      var datosAnilloGestion = {
+        labels: ['Gestión Interinstitucional 20%', ''], // Solo una etiqueta
         datasets: [{
-          label: 'Gestión Interinstitucional (20%)',
-          backgroundColor: 'rgba(255, 0, 0, 0.5)',
-          borderColor: 'rgba(255, 0, 0, 1)',
-          borderWidth: 1,
-          data: <?php echo json_encode($promediosGestion); ?>,
-          fill: false,
-          lineTension: 0
+          data: [<?php echo $promNacionalGestion; ?>, 20 - <?php echo $promNacionalGestion; ?>], // Valor real y valor restante
+          backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
         }]
-      }
-      var barChartCanvas = $('#intChart').get(0).getContext('2d')
-      var barChartData = $.extend(true, {}, areaChartData)
+      };
 
-      var barChartOptions = {
+      // Opciones del gráfico
+      var opcionesAnillo = {
         responsive: true,
         maintainAspectRatio: false,
-        datasetFill: false,
-        legend: {
-          display: true,
-        },
-        scales: {
-          xAxes: [{
-            gridLines: {
-              display: false,
-            }
-          }],
-          yAxes: [{
-            gridLines: {
-              display: true,
-            }
-          }]
-        },
+        cutoutPercentage: 75,
+        rotation: -Math.PI,
+        circumference: Math.PI
+      };
 
-      }
-      new Chart(barChartCanvas, {
-        type: 'bar',
-        data: barChartData,
-        options: barChartOptions
-      })
-
-    })
+      // Crear el gráfico de anillo en el canvas #intChart
+      new Chart(document.getElementById('intChart'), {
+        type: 'doughnut',
+        data: datosAnilloGestion, // Usar los datos específicos de gestión
+        options: opcionesAnillo
+      });
+    });
   </script>
   <script>
     $(function() {
-      var areaChartData = {
-        labels: <?php echo json_encode($nombresCentros); ?>,
+      var datosAnilloGestion = {
+        labels: ['Gestión Operativa 50%', ''], // Solo una etiqueta
         datasets: [{
-          label: 'Gestión Operativa (50%)',
-          backgroundColor: 'rgba(0, 255, 0, 0.5)',
-          borderColor: 'rgba(0, 255, 0, 1)',
-          borderWidth: 1,
-          data: <?php echo json_encode($promediosOperativa); ?>,
-          fill: false,
-          lineTension: 0
-        }]
-      }
-      var barChartCanvas = $('#opeChart').get(0).getContext('2d')
-      var barChartData = $.extend(true, {}, areaChartData)
+          data: [<?php echo $promNacionalOperativa; ?>, 50 - <?php echo $promNacionalOperativa; ?>], // Solo un valor
+          backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
 
-      var barChartOptions = {
+        }]
+      };
+
+      // Opciones del gráfico
+      var opcionesAnillo = {
         responsive: true,
         maintainAspectRatio: false,
-        datasetFill: false,
-        legend: {
-          display: true,
-        },
-        scales: {
-          xAxes: [{
-            gridLines: {
-              display: false,
-            }
-          }],
-          yAxes: [{
-            gridLines: {
-              display: true,
-            }
-          }]
-        },
+        cutoutPercentage: 75,
+        rotation: -Math.PI,
+        circumference: Math.PI,
+      };
 
-      }
-      new Chart(barChartCanvas, {
-        type: 'bar',
-        data: barChartData,
-        options: barChartOptions
-      })
-
-    })
+      // Crear el gráfico de anillo en el canvas #intChart
+      new Chart(document.getElementById('opeChart'), {
+        type: 'doughnut',
+        data: datosAnilloGestion, // Usar los datos específicos de gestión
+        options: opcionesAnillo
+      });
+    });
   </script>
   <script>
     $(function() {
-      var areaChartData = {
-        labels: <?php echo json_encode($nombresCentros); ?>,
+      var datosAnilloGestion = {
+        labels: ['Gestión Estrategica 30%'], // Solo una etiqueta
         datasets: [{
-          label: 'Gestión Estratégica (30%)',
-          backgroundColor: 'rgba(0, 0, 255, 0.5)',
-          borderColor: 'rgba(0, 0, 255, 1)',
-          borderWidth: 1,
-          data: <?php echo json_encode($promediosCalidad); ?>,
-          fill: false,
-          lineTension: 0
+          data: [<?php echo $promNacionalCalidad; ?>, 30 - <?php echo $promNacionalCalidad; ?>], // Solo un valor
+          backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
         }]
-      }
-      var barChartCanvas = $('#estraChart').get(0).getContext('2d')
-      var barChartData = $.extend(true, {}, areaChartData)
+      };
 
-      var barChartOptions = {
+      // Opciones del gráfico
+      var opcionesAnillo = {
         responsive: true,
         maintainAspectRatio: false,
-        datasetFill: false,
-        legend: {
-          display: true,
-        },
-        scales: {
-          xAxes: [{
-            gridLines: {
-              display: false,
-            }
-          }],
-          yAxes: [{
-            gridLines: {
-              display: true,
-            }
-          }]
-        },
+        cutoutPercentage: 75,
+        rotation: -Math.PI,
+        circumference: Math.PI
+      };
 
-      }
-      new Chart(barChartCanvas, {
-        type: 'bar',
-        data: barChartData,
-        options: barChartOptions
-      })
+      // Crear el gráfico de anillo en el canvas #intChart
+      new Chart(document.getElementById('estraChart'), {
+        type: 'doughnut',
+        data: datosAnilloGestion, // Usar los datos específicos de gestión
+        options: opcionesAnillo
+      });
+    });
+  </script>
 
-    })
+  <script>
+    $(function() {
+      var datosAnilloGestion = {
+        labels: ['Total Nacional (100%)'], // Solo una etiqueta
+        datasets: [{
+          data: [<?php echo $promNacionalCumplimiento; ?>, 100 - <?php echo $promNacionalCumplimiento; ?>], // Solo un valor
+          backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+        }]
+      };
+
+      // Opciones del gráfico
+      var opcionesAnillo = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutoutPercentage: 75,
+        rotation: -Math.PI,
+        circumference: Math.PI
+      };
+
+      // Crear el gráfico de anillo en el canvas #intChart
+      new Chart(document.getElementById('nacionalChart'), {
+        type: 'doughnut',
+        data: datosAnilloGestion, // Usar los datos específicos de gestión
+        options: opcionesAnillo
+      });
+    });
   </script>
 
   <script>
@@ -828,7 +916,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
         labels: <?php echo json_encode($nombresCentros); ?>,
         datasets: [{
           label: 'Total Cumplimiento de Gestión (100%)',
-          backgroundColor: 'rgba(255, 17, 0, 1)',
+          backgroundColor: '#FF5733',
           borderColor: 'rgba(60,141,188,0.8)',
           pointRadius: true,
           pointColor: '#3b8bba',
