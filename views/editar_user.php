@@ -115,7 +115,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <input type="text" id="direccion" name="direccion" class="form-control" value="<?php echo $usuario['direccion']; ?>">
                             </div>
                             <div class="form-group">
-                                <label for="fecha_nacimiento" class="form-label">Dirrecion:</label>
+                                <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
                                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control" value="<?php echo $usuario['fecha_nacimiento']; ?>">
                             </div>
                             <div class="form-group">
@@ -132,7 +132,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <select id="rol_id" name="rol_id" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                     <option value="ad2e8033-4a14-40d6-a999-1f1c6467a5e6" <?php echo ($usuario['rol_id'] == 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6') ? 'selected' : ''; ?>>Analista de datos</option>
                                     <option value="add38db6-1687-4e57-a763-a959400d9da2" <?php echo ($usuario['rol_id'] == 'add38db6-1687-4e57-a763-a959400d9da2') ? 'selected' : ''; ?>>Administrador</option>
-                                    <option value="e17a74c4-9627-443c-b020-23dc4818b718" <?php echo ($usuario['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718') ? 'selected' : ''; ?>>Usuario</option>
+                                    <option value="e17a74c4-9627-443c-b020-23dc4818b718" <?php echo ($usuario['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718') ? 'selected' : ''; ?>>Visualizador</option>
                                 </select>
                             </div>
 
@@ -169,7 +169,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                             <br>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-success">Editar</button>
-                                <a href="user.php" class="btn btn-danger">Cancelar</a>
+                                <a class="btn btn-danger" href="javascript:void(0);" onclick="history.back();">Cancelar</a>                           
                             </div>
                         </div>
                     </div>
@@ -177,6 +177,17 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
             </div>
         </div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const validacionExitosa = document.getElementById('validacion-exitosa').value === 'true';
+            if (!validacionExitosa) {
+                const errores = JSON.parse(document.getElementById('errores-validacion').value);
+                alert('Error en la validación del archivo:\n' + errores.join('\n'));
+                // Redirigir a la página anterior
+                history.back();
+            }
+        });
+    </script>
 </body>
 
 </html>

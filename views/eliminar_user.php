@@ -58,40 +58,30 @@ if (!isset($_SESSION['correo']) || empty($_SESSION['correo'])) {
     exit();
 }
 ?>
+<div class="card-body">
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar Usuarios</title>
-    <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-sm-6 offset-sm-3">
-                <div class="alert alert-danger text-center">
-                    <p>¿Desea desactivar el Usuario?</p>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <form action="../includes/_functions.php" method="POST">
-                            <input type="hidden" name="accion" value="eliminar_registro">
-                            <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
-                            <input type="submit" name="" value="Desactivar" class=" btn btn-danger">
-                            <a href="user.php" class="btn btn-success">Cancelar</a>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <div class="alert alert-danger text-center">
+        <p>¿Desea desactivar el Usuario?</p>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <form action="../includes/_functions.php" method="POST">
+                <input type="hidden" name="accion" value="eliminar_registro">
+                <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
+                <input type="submit" name="" value="Desactivar" class=" btn btn-danger">
+                <a class="btn btn-success" href="javascript:void(0);" onclick="history.back();">Cancelar</a>
+            </form>
         </div>
     </div>
-</body>
+</div>
 
-</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const validacionExitosa = document.getElementById('validacion-exitosa').value === 'true';
+        if (!validacionExitosa) {
+            const errores = JSON.parse(document.getElementById('errores-validacion').value);
+            alert('Error en la validación del archivo:\n' + errores.join('\n'));
+            history.back();
+        }
+    });
+</script>

@@ -45,7 +45,6 @@ if ($validar == null || $validar == '') {
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -66,7 +65,7 @@ if ($validar == null || $validar == '') {
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="ad2e8033-4a14-40d6-a999-1f1c6467a5e6">Analista de datos</option>
                                 <option value="add38db6-1687-4e57-a763-a959400d9da2">Administrador</option>
-                                <option value="e17a74c4-9627-443c-b020-23dc4818b718">Usuario</option>
+                                <option value="e17a74c4-9627-443c-b020-23dc4818b718">Visualizador</option>
                             </select>
                         </div>
                         <div class="form-group">

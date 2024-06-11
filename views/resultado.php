@@ -219,6 +219,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                                         <i class="nav-icon far fa-plus-square"></i>
                                         <p>Cargar Excel</p>
@@ -272,6 +278,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="#" class="nav-link">
                                         <i class="nav-icon fas fa-chart-pie"></i>
                                         <p>
@@ -314,32 +326,15 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="nav-icon fas fa-chart-pie"></i>
-                                        <p>
-                                            Usuario
-                                            <i class="right fas fa-angle-left"></i>
-                                        </p>
-                                    </a>
-                                    <ul class="nav nav-treeview">
-                                        <li class="nav-item">
-                                            <a href="#" class="nav-link" onclick="loadContent('admin.php')">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Usuarios</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="#" class="nav-link" onclick="loadContent('index.php')">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Nuevo usuario</p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item">
                                     <a href="tabla_admin.php" class="nav-link">
                                         <i class="nav-icon fas fa-table"></i>
                                         <p>Registros</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -357,8 +352,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
                                         <i class="nav-icon fas fa-chart-pie"></i>
-                                        <p>
-                                            Estadisticas
+                                        <p>Estadisticas
                                             <i class="right fas fa-angle-left"></i>
                                         </p>
                                     </a>
@@ -423,7 +417,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                         <div class="container mt-12">
                                             <h2> Estadisticas</h2>
                                             <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
-                                            
+
                                             <table id="example1" class="table table-bordered table-hover table-responsive">
                                                 <thead>
                                                     <tr>
@@ -436,7 +430,6 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-
                                                     // Obtener los parámetros ordenados por valor descendente
                                                     $consulta_parametros = "SELECT parametro, color FROM public.parametros ORDER BY parametro DESC";
                                                     $stmt_parametros = $pdo->query($consulta_parametros);
@@ -458,7 +451,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                             $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
                                                             $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
                                                             $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
-                                                        
+
 
                                                             $promedio_gestion_formatted = number_format($promedio_gestion, 2);
                                                             $promedio_operativa_formatted = number_format($promedio_operativa, 2);
@@ -506,7 +499,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                         $promedio_nacional_cumplimiento_gestion = $total_cumplimiento_gestion / $total_centros; // Promedio nacional de cumplimiento de gestión
 
                                                         echo "<tr style='font-weight: bold;'>";
-                                                        echo "<td>Valoración nacional</td>";
+                                                        echo "<td>Valoración Nacional</td>";
                                                         echo "<td>" . number_format($promedio_nacional_gestion, 2) . "</td>";
                                                         echo "<td>" . number_format($promedio_nacional_operativa, 2) . "</td>";
                                                         echo "<td>" . number_format($promedio_nacional_calidad, 2) . "</td>";
@@ -516,6 +509,67 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                     ?>
                                                         <tr class="text-center">
                                                             <td colspan="5">No existen registros</td>
+                                                        </tr>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="container mt-12">
+                                            <h2>Observaciones</h2>
+                                            <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                                            <table id="example1" class="table table-bordered table-hover table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Centro</th>
+                                                        <th>% de Convenios Estratégicos Reportados (10%)</th>
+                                                        <th>% de Compromisos institucionales cumplidos (10%)</th>
+                                                        <th>% de Operatividad de cámaras (20%)</th>
+                                                        <th>% de Ausentismo Operativo (20%)</th>
+                                                        <th>% de Cumplimiento Mobile Locator (10%)</th>
+                                                        <th>Incumplimiento de disposiciones (20%)</th>
+                                                        <th>Comunicación Estratégica (10%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $consulta = "SELECT c.nombre_centro,
+                                                    r.obv_conve_stra,
+                                                    r.obv_comp_insti,
+                                                    r.obv_opera_cam,
+                                                    r.obv_ausentimo,
+                                                    r.obv_mobile_locator,
+                                                    r.obv_dispoci,
+                                                    r.obv_com_estra
+                                            FROM public.registros AS r
+                                            LEFT JOIN centro AS c ON c.id_centro = r.id_centro
+                                            WHERE r.created_at = (
+                                                    
+                                                SELECT MAX(created_at)
+                                                FROM public.registros r2
+                                                WHERE r2.id_centro = r.id_centro
+                                            )  
+                                            ORDER BY c.nombre_centro";
+                                                    $stmt = $pdo->query($consulta);
+
+                                                    if ($stmt->rowCount() > 0) {
+                                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                            echo "<tr>";
+                                                            echo "<td>" . $row['nombre_centro'] . "</td>";
+                                                            echo "<td>" . $row['obv_conve_stra'] . "</td>";
+                                                            echo "<td>" . $row['obv_comp_insti'] . "</td>";
+                                                            echo "<td>" . $row['obv_opera_cam'] . "</td>";
+                                                            echo "<td>" . $row['obv_ausentimo'] . "</td>";
+                                                            echo "<td>" . $row['obv_mobile_locator'] . "</td>";
+                                                            echo "<td>" . $row['obv_dispoci'] . "</td>";
+                                                            echo "<td>" . $row['obv_com_estra'] . "</td>";
+                                                            echo "</tr>\n";
+                                                        }
+                                                    } else {
+                                                    ?>
+                                                        <tr class="text-center">
+                                                            <td colspan="8">No existen registros</td>
                                                         </tr>
                                                     <?php
                                                     }
@@ -536,7 +590,7 @@ $apellido_usuario = $datos_usuario['apellido'];
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-        <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+        <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
         Todos los derechos reservados.
     </footer>
     <!-- Control Sidebar -->

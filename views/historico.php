@@ -230,9 +230,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                         <?php
-                        // Obtener el ID de rol del usuario de la sesión
                         $rol_id = $_SESSION['rol_id'];
-
                         // Definir las opciones de navegación según el rol
                         switch ($rol_id) {
                             case 'add38db6-1687-4e57-a763-a959400d9da2': // Administrador
@@ -272,6 +270,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     <a href="tabla_admin.php" class="nav-link">
                                         <i class="nav-icon fas fa-table"></i>
                                         <p>Registros</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -328,6 +332,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="#" class="nav-link">
                                         <i class="nav-icon fas fa-chart-pie"></i>
                                         <p>
@@ -373,6 +383,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                                     <a href="tabla_admin.php" class="nav-link">
                                         <i class="nav-icon fas fa-table"></i>
                                         <p>Registros</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./obervaciones.php" class="nav-link">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Observaciones</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -432,14 +448,10 @@ $apellido_usuario = $datos_usuario['apellido'];
                         <?php
                         }
                         ?>
-
                     </ul>
                 </nav>
-                <!-- /.sidebar-menu -->
             </div>
-            <!-- /.sidebar -->
         </aside>
-        <!-- Content Wrapper. Contains page content -->
         <br>
         <div class="content-wrapper">
             <!-- Main content -->
@@ -459,7 +471,6 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                 <h2>Historico individual de los centros nacionales</h2>
                                             </div>
                                             <div class="col-md-3">
-
                                                 <form id="filterForm" class="mb-2" method="GET">
                                                     <div class="form-group">
                                                         <label for="centroSelect">Seleccione un centro:</label>
@@ -468,18 +479,24 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                             <?php
                                                             $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
                                                             $stmtCentros = $pdo->query($queryCentros);
+                                                            $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
+
                                                             while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
-                                                                echo "<option value='{$rowCentro['id_centro']}'>{$rowCentro['nombre_centro']}</option>";
+                                                                $isSelected = $rowCentro['id_centro'] == $selectedCentro ? 'selected' : '';
+                                                                echo "<option value='{$rowCentro['id_centro']}' $isSelected>{$rowCentro['nombre_centro']}</option>";
                                                             }
                                                             ?>
                                                         </select>
+
                                                         <label for="fechaInicio">Fecha de inicio:</label>
-                                                        <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+                                                        <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?php echo isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : ''; ?>">
+
                                                         <label for="fechaFin">Fecha de fin:</label>
-                                                        <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+                                                        <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?php echo isset($_GET['fechaFin']) ? $_GET['fechaFin'] : ''; ?>">
                                                     </div>
-                                                    <div id="filtrosAdicionales" class="form-group"></div>
+
                                                     <button type="submit" class="btn btn-primary">Filtrar</button>
+
                                                     <?php if ($hayFiltrosIngresados) : ?>
                                                         <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
                                                     <?php endif; ?>
@@ -512,20 +529,14 @@ $apellido_usuario = $datos_usuario['apellido'];
                 </div>
         </div>
         </section>
-        <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
     <footer class="main-footer">
-        <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+        <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
         Todos los derechos reservados.
     </footer>
-    <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
     </aside>
-    <!-- /.control-sidebar -->
     </div>
-    <!-- ./wrapper -->
     <!-- jQuery -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- jQuery UI 1.11.4 -->
@@ -703,11 +714,18 @@ $apellido_usuario = $datos_usuario['apellido'];
             });
 
             function limpiarFiltros() {
-                document.getElementById('tipoFiltro').value = '';
+                // Limpiar los valores de los input type date
                 document.getElementById('fechaInicio').value = '';
                 document.getElementById('fechaFin').value = '';
-                document.getElementById('centroSelect').value = '';
-                // Aquí puedes agregar más líneas para limpiar otros filtros si es necesario
+
+                // Limpiar la selección del centro
+                document.getElementById('centroSelect').selectedIndex = 0;
+
+                // Limpiar los checkboxes
+                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
             }
         </script>
     <?php endif; ?>

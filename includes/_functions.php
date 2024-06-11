@@ -202,7 +202,7 @@ function solicitar_recuperacion()
             $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";
 
             list($encryptedPassword, $iv) = explode('::', base64_decode($usuario['password']), 2); // Desencriptar la contraseña
-            $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv); 
+            $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv);
 
             $asunto = "Recuperacion de clave del Cuadro de Mando y Gestion";
             $mensaje = "Tu clave es: " . $password;
@@ -243,7 +243,7 @@ function solicitar_recuperacion()
 
 function actualizar_registro()
 {
-    global $pdo; 
+    global $pdo;
 
     // Verificar si se recibieron datos
     if (
@@ -296,23 +296,8 @@ function actualizar_registro()
             }
         }
 
-        echo "<script>alert('Registros actualizados exitosamente.');;
-        setTimeout(function() {";
-
-        $rol_id = $_SESSION['rol_id'];
-        $paginas_redireccion = [
-            'add38db6-1687-4e57-a763-a959400d9da2' => 'user.php',
-            'e17a74c4-9627-443c-b020-23dc4818b718' => 'lector.php',
-            'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => 'analista.php'
-        ];
-
-        if (array_key_exists($rol_id, $paginas_redireccion)) {
-            echo "window.location.href = '../views/" . $paginas_redireccion[$rol_id] . "';";
-        } else {
-            echo "window.location.href = '../views/acceso_denegado.php';";
-        }
-
-        echo "}, 1000); 
-        </script>";
+        echo "<script>location = '../views/tabla_admin.php';</script>";
+    } else {
+        echo "window.location.href = '../views/acceso_denegado.php';";
     }
 }

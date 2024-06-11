@@ -307,6 +307,12 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                     <i class="nav-icon far fa-plus-square"></i>
                     <p>Cargar Excel</p>
@@ -347,6 +353,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                     </li>
                   </ul>
                 </li>
+
               <?php
                 break;
               case 'e17a74c4-9627-443c-b020-23dc4818b718': // Visualizador
@@ -357,6 +364,12 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                     <p>
                       Inicio
                     </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -408,6 +421,12 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                     <i class="nav-icon far fa-plus-square"></i>
                     <p>Cargar Excel</p>
@@ -451,7 +470,6 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
               <?php
                 break;
               default:
-                // No se encontró un rol válido
               ?>
                 <li class="nav-item">
                   <a href="#" class="nav-link">
@@ -484,13 +502,13 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                 <div id="chart-container">
                   <div class="card-body">
                     <div class="col-md-12">
-                      <h2> Informacion estadistica</h2>
+                      <h2>Informacion estadistica: </h2>
                       <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
                       <div class="row">
                         <div class="col-md-3">
                           <div class="card card-success" style="height:25rem;">
                             <div class="card-header">
-                              <h3 class="card-title">Interinstitucional (20%)</h3>
+                              <h3 class="card-title">Interinstitucional(20%)</h3>
                               <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                   <i class="fas fa-minus"></i>
@@ -506,11 +524,11 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                           </div>
                           <div class="row">
                             <div class="col-md-6" style="border:inset; height:8.44rem;">
-                              <p style="text-align:center;">Convenios Estrategicos Respotados (10%):</p>
+                              <p style="text-align:center;">Convenios estratégicos reportados(10%):</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioConveStra, 2)); ?> %</h4>
                             </div>
                             <div class="col-md-6" style="border:inset;">
-                              <p style="text-align:center;">Compromisos intitucionales cumplidos (10%)</p>
+                              <p style="text-align:center;">Compromisos institucionales cumplidos(10%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioCompInsti, 2)); ?> %</h4>
                             </div>
                           </div>
@@ -518,7 +536,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                         <div class="col-md-6">
                           <div class="card card-success" style="height:25rem;">
                             <div class="card-header">
-                              <h3 class="card-title">Operativa (50%)</h3>
+                              <h3 class="card-title">Operativa(50%)</h3>
                               <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                   <i class="fas fa-minus"></i>
@@ -534,15 +552,15 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                           </div>
                           <div class="row">
                             <div class="col-md-4" style="border:inset; height:8.44rem; "">
-                              <p style=" text-align:center;">Operatividad de camaras (20%)</p>
+                              <p style=" text-align:center;">Operatividad de cámaras(20%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediooperacam, 2)); ?> %</h4>
                             </div>
                             <div class="col-md-4" style="border:inset;">
-                              <p style="text-align:center;">Ausentismo Operativo (20%)</p>
+                              <p style="text-align:center;">Ausentismo Operativo(20%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promedioausentimo, 2)); ?> %</h4>
                             </div>
                             <div class="col-md-4" style="border:inset;">
-                              <p style="text-align:center;">Cumplimiento Movile Locator (10%)</p>
+                              <p style="text-align:center;">Cumplimiento Mobile Locator(10%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediomobilelocator, 2)); ?> %</h4>
                             </div>
                           </div>
@@ -550,7 +568,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                         <div class="col-md-3">
                           <div class="card card-success" style="height:25rem;">
                             <div class="card-header">
-                              <h3 class="card-title ">Estratégica (30%)</h3>
+                              <h3 class="card-title ">Estratégica(30%)</h3>
                               <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                   <i class="fas fa-minus"></i>
@@ -566,11 +584,11 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                           </div>
                           <div class="row">
                             <div class="col-md-6" style="border:inset; height:8.44rem;">
-                              <p style="text-align:center;">Incumplimiento de disposiciones (20%)</p>
+                              <p style="text-align:center;">Incumplimiento de disposiciones(20%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediodispoci, 2)); ?> %</h4>
                             </div>
                             <div class="col-md-6" style="border:inset;">
-                              <p style="text-align:center;">Comunicacion estrategica(10%)</p>
+                              <p style="text-align:center;">Comunicación estratégica(10%)</p>
                               <h4 style="text-align:center;"><?php echo htmlspecialchars(number_format($promediocomestra, 2)); ?> %</h4>
                             </div>
                           </div>
@@ -639,7 +657,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+    <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
     Todos los derechos reservados.
   </footer>
   <!-- Control Sidebar -->
@@ -806,6 +824,8 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
         datasets: [{
           data: [<?php echo $promNacionalGestion; ?>, 20 - <?php echo $promNacionalGestion; ?>], // Valor real y valor restante
           backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+          hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+
         }]
       };
 
@@ -833,7 +853,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
         datasets: [{
           data: [<?php echo $promNacionalOperativa; ?>, 50 - <?php echo $promNacionalOperativa; ?>], // Solo un valor
           backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
-
+          hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
         }]
       };
 
@@ -861,6 +881,8 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
         datasets: [{
           data: [<?php echo $promNacionalCalidad; ?>, 30 - <?php echo $promNacionalCalidad; ?>], // Solo un valor
           backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+          hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+
         }]
       };
 
@@ -889,6 +911,7 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
         datasets: [{
           data: [<?php echo $promNacionalCumplimiento; ?>, 100 - <?php echo $promNacionalCumplimiento; ?>], // Solo un valor
           backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+          hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
         }]
       };
 

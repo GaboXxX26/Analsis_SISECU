@@ -6,8 +6,8 @@ $validar = $_SESSION['correo'];
 
 if ($validar == null || $validar == '') {
 
-    header("Location: ../includes/login.php");
-    die();
+  header("Location: ../includes/login.php");
+  die();
 }
 // Verificar si el usuario está activo
 $query = "	SELECT  estado FROM public.user WHERE correo = :correo";
@@ -17,10 +17,10 @@ $stmt->execute();
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$usuario || $usuario['estado'] != 'Activo') {
-    // El usuario no existe o no está activo
-    // Redirigir a una página de error o mostrar un mensaje
-    header("Location: ../views/acceso_denegado.php");
-    die();
+  // El usuario no existe o no está activo
+  // Redirigir a una página de error o mostrar un mensaje
+  header("Location: ../views/acceso_denegado.php");
+  die();
 }
 $query = "SELECT rol_id FROM public.user WHERE correo = :correo";
 $stmt = $pdo->prepare($query);
@@ -32,9 +32,9 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+  'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+  'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+  'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
 ];
 
 // Obtener el mes, año, trimestre, rango de fechas y centro seleccionados
@@ -233,6 +233,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a href="#" class="nav-link " onclick="loadContent('archivo.php')">
                     <i class="nav-icon far fa-plus-square"></i>
                     <p>Cargar Excel</p>
@@ -286,6 +292,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a href="#" class="nav-link">
                     <i class="nav-icon fas fa-chart-pie"></i>
                     <p>
@@ -331,6 +343,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                   <a href="tabla_admin.php" class="nav-link">
                     <i class="nav-icon fas fa-table"></i>
                     <p>Registros</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./obervaciones.php" class="nav-link">
+                    <i class="nav-icon fas fa-book"></i>
+                    <p>Observaciones</p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -411,8 +429,8 @@ $apellido_usuario = $datos_usuario['apellido'];
                 <!-- /.card-header -->
                 <div class="card-body">
                   <div class="container mt-5" id="filter-container">
-                    <h2 class="mb-4">Filtro de registros por centro</h2>
                     <form id="filterForm" class="mb-4" method="GET">
+                      <h2 class="mb-4">Filtro de registros por centro</h2>
                       <div class="form-group">
                         <label for="centroSelect">Seleccione un centro:</label>
                         <select id="centroSelect" name="centro" class="form-control" required>
@@ -446,7 +464,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                         <thead>
                           <tr>
                             <th colspan="2">Datos Generales</th>
-                            <th colspan="2">Indicadores de Gestión (20%)</th>
+                            <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
                             <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
                             <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
                           </tr>
@@ -502,14 +520,13 @@ $apellido_usuario = $datos_usuario['apellido'];
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+      <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
       Todos los derechos reservados.
     </footer>
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
     </aside>
-    <!-- /.control-sidebar -->
   </div>
   <!-- ./wrapper -->
   <!-- jQuery -->
@@ -602,33 +619,6 @@ $apellido_usuario = $datos_usuario['apellido'];
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
   </script>
-
-  <script>
-    function loadContent(url) {
-      fetch(url)
-        .then(response => response.text())
-        .then(data => {
-          document.getElementById('content-container').innerHTML = data;
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    window.addEventListener('load', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const section = urlParams.get('section');
-
-      if (section === 'parametro') {
-        loadContent('parametro.php');
-      } else if (section === 'nuevo usuario') {
-        loadContent('index.php');
-      } else if (section === 'editar') {
-        loadContent('admin.php');
-      } else if (section === 'elimniar') {
-        loadContent('admin.php');
-      }
-
-    });
-  </script>
   <script>
     document.getElementById('filterTypeSelect').addEventListener('change', function() {
       var filtrosAdicionales = document.getElementById('filtrosAdicionales');
@@ -696,6 +686,25 @@ $apellido_usuario = $datos_usuario['apellido'];
         `;
       }
 
+    });
+  </script>
+  <script>
+    function loadContent(url) {
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('content-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    window.addEventListener('load', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+
+      if (section === 'registro') {
+        loadContent('tabla_admin.php');
+      }
     });
   </script>
 </body>

@@ -57,7 +57,7 @@ if (isset($_POST['registrar'])) {
             'estado' => $estado
         ]);
 
-        echo "<script>alert('Usuario desactivado exitosamente.');</script>";
+        echo "<script>alert('Usuario creado exitosamente.');</script>";
         echo "<script>window.location.href = '../views/user.php?section=nuevo usuario';</script>";
     }
 }

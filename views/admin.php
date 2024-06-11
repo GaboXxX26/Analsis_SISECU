@@ -14,10 +14,8 @@ if ($validar == null || $validar == '') {
 
 ?>
 <div class="card-body">
-  <div class="card-header">
-    <h3 class="card-title">Tabla de Usuarios registrados en el Sistema</h3>
-  </div>
-  <table id="example1" class="table table-bordered table-striped "">
+  <h1> Tabla de usuarios registrados en el sistema</h1>
+  <table id="example1" class="table table-bordered table-striped  table-responsive">
     <thead>
       <tr>
         <th>Estado</th>
@@ -35,7 +33,7 @@ if ($validar == null || $validar == '') {
       $consulta = "SELECT u.estado, u.id, u.nombre, u.apellido, u.correo, p.rol, c.nombre_centro FROM public.user as u
         LEFT Join permisos as p ON u.rol_id = p.id
         LEFT JOIN centro as c ON c.id_centro=u.id_centro 
-        WHERE u.estado = 'Activo' ";
+        WHERE u.estado = 'Activo'";
 
       $stmt = $pdo->query($consulta);
 

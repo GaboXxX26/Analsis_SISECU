@@ -2,105 +2,85 @@
 include "../includes/_db.php";
 session_start();
 error_reporting(0);
+$validar = $_SESSION['correo'];
 
+if ($validar == null || $validar == '') {
 
-// Obtener los filtros seleccionados
-// Obtener los filtros seleccionados
-$selectedCentros = isset($_GET['centros']) ? $_GET['centros'] : [];
-$selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
-$fechaInicio = isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
-$fechaFin = isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
-
-// Obtener el nombre del centro seleccionado
-$nombreCentro = '';
-if (!empty($selectedCentro)) {
-    $queryCentroNombre = "SELECT nombre_centro FROM centro WHERE id_centro = ?";
-    $stmtCentroNombre = $pdo->prepare($queryCentroNombre);
-    $stmtCentroNombre->execute([$selectedCentro]);
-    if ($stmtCentroNombre->rowCount() > 0) {
-        $nombreCentro = $stmtCentroNombre->fetchColumn();
-    }
+    header("Location: ../includes/login.php");
+    die();
 }
+// Verificar si el usuario está activo
+$query = "	SELECT  estado FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$usuario || $usuario['estado'] != 'Activo') {
+    // El usuario no existe o no está activo
+    // Redirigir a una página de error o mostrar un mensaje
+    header("Location: ../views/acceso_denegado.php");
+    die();
+}
+$query = "SELECT rol_id FROM public.user WHERE correo = :correo";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':correo', $validar);
+$stmt->execute();
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$_SESSION['rol_id'] = $usuario['rol_id'];
+
+// Definir permisos por rol
+$permisos = [
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+];
+
+// Obtener el mes, año, trimestre, rango de fechas y centro seleccionados
+$selectedMonth = isset($_GET['month']) ? $_GET['month'] : '';
+$selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
+$selectedTrimestre = isset($_GET['trimestre']) ? $_GET['trimestre'] : '';
+$selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : 'ef48298f-cedf-4718-aa67-b097c80ef23b';
+$selectedRango = isset($_GET['filterType']) && $_GET['filterType'] == 'rango';
+$fechaInicio = $selectedRango && isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
+$fechaFin = $selectedRango && isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
 
 // Construir la consulta SQL con condiciones opcionales
-$consulta = "SELECT TO_CHAR(r.created_at, 'TMMonth') AS nombre_mes, r.id_registro, c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra, TO_CHAR(r.created_at, 'MM') AS mes_creado
+$consulta = "SELECT r.id_registro,c.nombre_centro, r.obv_conve_stra, r.obv_comp_insti, r.obv_opera_cam, r.obv_ausentimo, r.obv_mobile_locator, r.obv_dispoci, r.obv_com_estra, TO_CHAR(r.created_at, 'TMMonth') AS mes_creado
                 FROM public.registros AS r 
-                LEFT JOIN centro AS c ON c.id_centro = r.id_centro 
-                WHERE 1=1 ";
-$params = [];
+                LEFT JOIN centro AS c ON c.id_centro = r.id_centro
+                WHERE r.id_centro = :selectedCentro";
+$params = [
+    'selectedCentro' => $selectedCentro
+];
 
-// Aplicar filtros dinámicamente
-if (!empty($selectedCentros)) {
-    $placeholders = implode(',', array_fill(0, count($selectedCentros), '?'));
-    $consulta .= " AND r.id_centro IN ($placeholders)";
-    $params = array_merge($params, $selectedCentros);
-} elseif (!empty($selectedCentro)) {
-    $consulta .= " AND r.id_centro = ?";
-    $params[] = $selectedCentro;
+// Agregar filtros según el tipo seleccionado
+if (!empty($_GET['filterType'])) {
+    if ($_GET['filterType'] == 'mensual' && $selectedMonth != '') {
+        $consulta .= " AND EXTRACT(MONTH FROM r.created_at) = :selectedMonth AND EXTRACT(YEAR FROM r.created_at) = :selectedYear";
+        $params['selectedMonth'] = $selectedMonth;
+        $params['selectedYear'] = $selectedYear;
+    } elseif ($_GET['filterType'] == 'trimestral' && $selectedTrimestre != '') {
+        $consulta .= " AND EXTRACT(QUARTER FROM r.created_at) = :selectedTrimestre AND EXTRACT(YEAR FROM r.created_at) = :selectedYear";
+        $params['selectedTrimestre'] = $selectedTrimestre;
+        $params['selectedYear'] = $selectedYear;
+    } elseif ($_GET['filterType'] == 'rango' && !empty($fechaInicio) && !empty($fechaFin)) {
+        // Convertir las fechas a timestamp with time zone
+        $fechaInicio .= ' 00:00:00'; // Agregar hora, minuto y segundo de inicio del día
+        $fechaFin .= ' 23:59:59';   // Agregar hora, minuto y segundo de fin del día
+        $consulta .= " AND r.created_at BETWEEN :fechaInicio AND :fechaFin";
+        $params['fechaInicio'] = $fechaInicio;
+        $params['fechaFin'] = $fechaFin;
+    }
+} else {
+    $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = EXTRACT(YEAR FROM CURRENT_TIMESTAMP)"; // Usar CURRENT_TIMESTAMP
 }
 
-if (!empty($fechaInicio) && !empty($fechaFin)) {
-    $fechaInicio .= ' 00:00:00';
-    $fechaFin .= ' 23:59:59';
-    $consulta .= " AND r.created_at BETWEEN ? AND ?";
-    $params[] = $fechaInicio;
-    $params[] = $fechaFin;
-}
+$consulta .= " ORDER BY r.created_at";
 
-$consulta .= " ORDER BY r.created_at";  // Añadir ordenamiento al final de la consulta
-
-// Preparar y ejecutar la consulta
 $stmt = $pdo->prepare($consulta);
 $stmt->execute($params);
-
-// Procesar los resultados de la consulta para generar los datos de los gráficos
-$datosGrafica = [];
-$nombresMeses = [];
-$promediosGestion = [];
-$promediosOperativa = [];
-$promediosCalidad = [];
-
-if ($stmt->rowCount() > 0) {
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $mes = $row['nombre_mes'];
-        $centro = $row['nombre_centro'];
-
-        if (!isset($datosGrafica[$centro])) {
-            $datosGrafica[$centro] = [
-                'nombre' => $centro,
-                'gestion' => [],
-                'operativa' => [],
-                'calidad' => []
-            ];
-        }
-
-        $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
-        $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
-        $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
-
-        if (!in_array($mes, $nombresMeses)) {
-            $nombresMeses[] = $mes;
-        }
-
-        $datosGrafica[$centro]['gestion'][$mes] = number_format($promedio_gestion, 2);
-        $datosGrafica[$centro]['operativa'][$mes] = number_format($promedio_operativa, 2);
-        $datosGrafica[$centro]['calidad'][$mes] = number_format($promedio_calidad, 2);
-    }
-}
-
-// Convertir los valores de cada centro en un formato adecuado para los gráficos
-foreach ($datosGrafica as &$centro) {
-    foreach (['gestion', 'operativa', 'calidad'] as $tipo) {
-        $valores = [];
-        foreach ($nombresMeses as $mes) {
-            $valores[] = isset($centro[$tipo][$mes]) ? $centro[$tipo][$mes] : 0;
-        }
-        $centro[$tipo] = $valores;
-    }
-}
-
-// Generar el gráfico solo si hay datos
-$hayFiltrosIngresados = !empty($selectedCentros) || !empty($selectedCentro) || (!empty($fechaInicio) && !empty($fechaFin));
 
 $query_rol = "SELECT rol FROM permisos WHERE id = :id";
 $stmt_rol = $pdo->prepare($query_rol);
@@ -116,6 +96,7 @@ $datos_usuario = $stmt_nombre_apellido->fetch(PDO::FETCH_ASSOC);
 
 $nombre_usuario = $datos_usuario['nombre'];
 $apellido_usuario = $datos_usuario['apellido'];
+
 ?>
 
 <!DOCTYPE html>
@@ -186,7 +167,6 @@ $apellido_usuario = $datos_usuario['apellido'];
             </div>
         </nav>
         <!-- /.navbar -->
-
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
@@ -197,16 +177,13 @@ $apellido_usuario = $datos_usuario['apellido'];
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
                 <br>
                 <div>
                     <div class="info">
                         <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
-
                         <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
                     </div>
                 </div>
-                <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
@@ -438,6 +415,7 @@ $apellido_usuario = $datos_usuario['apellido'];
             </div>
             <!-- /.sidebar -->
         </aside>
+
         <!-- Content Wrapper. Contains page content -->
         <br>
         <div class="content-wrapper">
@@ -450,114 +428,103 @@ $apellido_usuario = $datos_usuario['apellido'];
                             <div class="card">
                                 <!-- /.card-header -->
                                 <div class="card-body">
-                                    <br>
-
-                                    <h1> Filtro comparativo de centros</h1>
-                                    <?php
-                                    $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
-                                    ?>
-                                    <div class="col-md-3" id="filter-container">
-                                        <form id="filterForm" class="mb-2" method="GET">
+                                    <div class="container mt-5" id="filter-container">
+                                        <h2 class="mb-4">Filtro de registros por centro</h2>
+                                        <form id="filterForm" class="mb-4" method="GET">
                                             <div class="form-group">
-                                                <label for="centroSelect" style>Seleccione maximo 7 centros:</label>
-                                                <div class="form-check">
+                                                <label for="centroSelect">Seleccione un centro:</label>
+                                                <select id="centroSelect" name="centro" class="form-control" required>
+                                                    <option value="">Seleccione un centro</option>
                                                     <?php
-                                                    // Realizar la consulta para obtener los centros
                                                     $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
                                                     $stmtCentros = $pdo->query($queryCentros);
 
-                                                    // Iterar sobre los resultados y generar los checkboxes
                                                     while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
-                                                        // Determinar si el checkbox debe estar marcado
-                                                        $checked = in_array($rowCentro['id_centro'], $selectedCentros) ? 'checked' : '';
-                                                        echo "<input type='checkbox' id='centroSelect_{$rowCentro['id_centro']}' name='centros[]' value='{$rowCentro['id_centro']}' $checked>";
-                                                        echo "<label for='centroSelect_{$rowCentro['id_centro']}'> {$rowCentro['nombre_centro']}</label><br>";
+                                                        $selected = ($selectedCentro == $rowCentro['id_centro']) ? 'selected' : '';
+                                                        echo "<option value='{$rowCentro['id_centro']}' $selected>{$rowCentro['nombre_centro']}</option>";
                                                     }
                                                     ?>
-                                                </div>
-                                                <label for="fechaInicio">Fecha de inicio:</label>
-                                                <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?= isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '' ?>">
-                                                <label for="fechaFin">Fecha de fin:</label>
-                                                <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?= isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '' ?>">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="filterTypeSelect">Seleccione tipo de filtro:</label>
+                                                <select id="filterTypeSelect" name="filterType" class="form-control">
+                                                    <option value="">Seleccione un filtro</option>
+                                                    <option value="mensual" <?php if (empty($_GET['filterType']) || $_GET['filterType'] == 'mensual') ?>>Mensual</option>
+                                                    <option value="trimestral" <?php if (!empty($_GET['filterType']) && $_GET['filterType'] == 'trimestral') ?>>Trimestral</option>
+                                                    <option value="rango" <?php if (!empty($_GET['filterType']) && $_GET['filterType'] == 'rango') ?>>Rango de fechas</option>
+                                                </select>
                                             </div>
                                             <div id="filtrosAdicionales" class="form-group">
                                             </div>
                                             <button type="submit" class="btn btn-primary">Filtrar</button>
-                                            <?php if ($hayFiltrosIngresados) : ?>
-                                                <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
-                                            <?php endif; ?>
+                                        </form>
+                                        <form action="../includes/_functions.php" method="POST">
+                                            <table id="example1" class="table table-bordered table-striped table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="2">Datos Generales</th>
+                                                        <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
+                                                        <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
+                                                        <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Mes</th>
+                                                        <th>Centro</th>
+                                                        <th>% de Convenios Estratégicos Reportados (10%)</th>
+                                                        <th>% de Compromisos institucionales cumplidos (10%)</th>
+                                                        <th>% de Operatividad de cámaras (20%)</th>
+                                                        <th>% de Ausentismo Operativo (20%)</th>
+                                                        <th>% de Cumplimiento Mobile Locator (10%)</th>
+                                                        <th>% Incumplimiento de disposiciones (20%)</th>
+                                                        <th>% Comunicación Estratégica (10%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    if ($stmt->rowCount() > 0) {
+                                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                            echo "<tr>";
+                                                            echo "<td>" . $row['mes_creado'] . "</td>";
+                                                            echo "<td>" . $row['nombre_centro'] . "</td>";
+                                                            echo "<td>" . $row['obv_conve_stra'] . "</td>";
+                                                            echo "<td>" . $row['obv_comp_insti'] . "</td>";
+                                                            echo "<td>" . $row['obv_opera_cam'] . "</td>";
+                                                            echo "<td>" . $row['obv_ausentimo'] . "</td>";
+                                                            echo "<td>" . $row['obv_mobile_locator'] . "</td>";
+                                                            echo "<td>" . $row['obv_dispoci'] . "</td>";
+                                                            echo "<td>" . $row['obv_com_estra'] . "</td>";
+                                                            echo "</tr>\n";
+                                                        }
+                                                    } else {
+                                                        echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                            <input type="hidden" name="accion" value="actualizar_registro">
+                                            <button type="submit" class="btn btn-primary">Editar</button>
                                         </form>
                                     </div>
-                                    <div id="chart-container">
-                                        <div class="col-md-12">
-                                            <div class="card card-success">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Indicadores Gestion Interinstitucional 20% </h3>
-                                                    <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart">
-                                                        <canvas id="gestionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card card-success">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Indicadores de gestion operativa (50%)</h3>
-                                                    <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart">
-                                                        <canvas id="calidadChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card card-success">
-                                                <div class="card-header">
-                                                    <h3 class="card-title"> Indicadores de calidad (30%)</h3>
-                                                    <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart">
-                                                        <canvas id="operativaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div id="content-container"></div>
                                 </div>
                             </div>
-                            <div id="content-container"></div>
                         </div>
                     </div>
                 </div>
+            </section>
+            <!-- /.content -->
         </div>
-    </div>
-    </section>
-    <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
-        Todos los derechos reservados.
-    </footer>
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2024 <a href="https://www.ecu911.gob.ec/" target="_blank">Sistema Integrado de Seguridad ECU 911</a>.</strong>
+            Todos los derechos reservados.
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -609,30 +576,6 @@ $apellido_usuario = $datos_usuario['apellido'];
     <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- Page specific script -->
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"][name="centros[]"]');
-            const maxSelections = 7;
-
-            const updateCheckboxes = () => {
-                const selectedCount = document.querySelectorAll('input[type="checkbox"][name="centros[]"]:checked').length;
-                checkboxes.forEach(box => {
-                    if (!box.checked && selectedCount >= maxSelections) {
-                        box.disabled = true;
-                    } else {
-                        box.disabled = false;
-                    }
-                });
-            };
-
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateCheckboxes);
-            });
-
-            // Inicialización para bloquear casillas si ya hay 7 seleccionadas al cargar la página
-            updateCheckboxes();
-        });
-    </script>
-    <script>
         function checkContent() {
             var contentContainer = document.getElementById('content-container');
             var filterContainer = document.getElementById('filter-container');
@@ -664,6 +607,18 @@ $apellido_usuario = $datos_usuario['apellido'];
         });
     </script>
     <script>
+        $(function() {
+            $("#example1").DataTable({
+                "responsive": false,
+                "lengthChange": true,
+                "autoWidth": true,
+                "scrollX": true,
+
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+
+    <script>
         function loadContent(url) {
             fetch(url)
                 .then(response => response.text())
@@ -689,72 +644,75 @@ $apellido_usuario = $datos_usuario['apellido'];
 
         });
     </script>
-    <?php if ($hayFiltrosIngresados) : ?>
-        <script>
-            $(function() {
-                var nombresMeses = <?php echo json_encode($nombresMeses); ?>;
-                var datosGrafica = <?php echo json_encode(array_values($datosGrafica)); ?>;
-                var colores = ['rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 165, 0, 0.5)', 'rgba(75, 0, 130, 0.5)', 'rgba(255, 255, 0, 1)', 'rgba(255, 0, 255, 1)', 'rgba(0, 255, 255, 1)', 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 1)', 'rgba(128, 0, 0, 1)', 'rgba(128, 128, 0, 1)', 'rgba(0, 128, 0, 1)', 'rgba(128, 0, 128, 1)', 'rgba(0, 128, 128, 1)', 'rgba(192, 192, 192, 1)', 'rgba(255, 165, 0, 1)']; // Añadir más colores si hay más centros
+    <script>
+        document.getElementById('filterTypeSelect').addEventListener('change', function() {
+            var filtrosAdicionales = document.getElementById('filtrosAdicionales');
 
-                function crearGrafico(canvasId, tipo) {
-                    var datasets = [];
+            // Limpia el contenido del contenedor
+            filtrosAdicionales.innerHTML = '';
 
-                    datosGrafica.forEach(function(centro, index) {
-                        datasets.push({
-                            label: centro.nombre,
-                            backgroundColor: colores[index % colores.length],
-                            borderColor: colores[index % colores.length].replace('0.5', '1'),
-                            borderWidth: 1,
-                            data: centro[tipo],
-                            fill: false,
-                            lineTension: 0
-                        });
-                    });
-
-                    var chartData = {
-                        labels: nombresMeses,
-                        datasets: datasets
-                    };
-
-                    var chartCanvas = $('#' + canvasId).get(0).getContext('2d');
-                    var chartOptions = {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        datasetFill: false,
-                        scales: {
-                            xAxes: [{
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }]
-                        }
-                    };
-
-                    new Chart(chartCanvas, {
-                        type: 'bar',
-                        data: chartData,
-                        options: chartOptions
-                    });
+            if (this.value === 'trimestral') {
+                // Agrega los selectores de trimestre y año
+                filtrosAdicionales.innerHTML = `
+            <label for="trimestreSelect">Seleccione un trimestre:</label>
+            <select id="trimestreSelect" name="trimestre" class="form-control">
+                <option value="1">Trimestre 1</option>
+                <option value="2">Trimestre 2</option>
+                <option value="3">Trimestre 3</option>
+                <option value="4">Trimestre 4</option>
+            </select>
+            <label for="yearSelect">Seleccione un año:</label>
+            <select id="yearSelect" name="year" class="form-control" required>
+                <?php
+                $currentYear = date('Y');
+                for ($year = $currentYear; $year >= 2000; $year--) {
+                    echo "<option value=\"$year\"" . ($selectedYear == $year ? ' selected' : '') . ">$year</option>";
                 }
+                ?>
+            </select>
+        `;
+            } else if (this.value === 'mensual') { // Agrega esta condición
+                // Agrega los selectores de mes y año
+                filtrosAdicionales.innerHTML = `
+            <label for="monthSelect">Seleccione un mes:</label>
+            <select id="monthSelect" name="month" class="form-control">
+                <option value="" selected>Seleccione un mes</option>
+                <option value="01" <?= $selectedMonth == '01' ? 'selected' : '' ?>>Enero</option>
+                <option value="02" <?= $selectedMonth == '02' ? 'selected' : '' ?>>Febrero</option>
+                <option value="03" <?= $selectedMonth == '03' ? 'selected' : '' ?>>Marzo</option>
+                <option value="04" <?= $selectedMonth == '04' ? 'selected' : '' ?>>Abril</option>
+                <option value="05" <?= $selectedMonth == '05' ? 'selected' : '' ?>>Mayo</option>
+                <option value="06" <?= $selectedMonth == '06' ? 'selected' : '' ?>>Junio</option>
+                <option value="07" <?= $selectedMonth == '07' ? 'selected' : '' ?>>Julio</option>
+                <option value="08" <?= $selectedMonth == '08' ? 'selected' : '' ?>>Agosto</option>
+                <option value="09" <?= $selectedMonth == '09' ? 'selected' : '' ?>>Septiembre</option>
+                <option value="10" <?= $selectedMonth == '10' ? 'selected' : '' ?>>Octubre</option>
+                <option value="11" <?= $selectedMonth == '11' ? 'selected' : '' ?>>Noviembre</option>
+                <option value="12" <?= $selectedMonth == '12' ? 'selected' : '' ?>>Diciembre</option>
+            </select>
+            <label for="yearSelect">Seleccione un año:</label>
+            <select id="yearSelect" name="year" class="form-control" required>
+                <?php
+                $currentYear = date('Y');
+                for ($year = $currentYear; $year >= 2000; $year--) {
+                    echo "<option value=\"$year\"" . ($selectedYear == $year ? ' selected' : '') . ">$year</option>";
+                }
+                ?>
+            </select>
+        `;
+            } else if (this.value === 'rango') {
+                // Agrega los campos de rango de fechas
+                filtrosAdicionales.innerHTML = `
+            <label for="fechaInicio">Fecha de inicio:</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?= $fechaInicio ?>">
 
-                crearGrafico('gestionChart', 'gestion');
-                crearGrafico('operativaChart', 'operativa');
-                crearGrafico('calidadChart', 'calidad');
-            });
-
-            function limpiarFiltros() {
-                // Limpiar los valores de los input type date
-                document.getElementById('fechaInicio').value = '';
-                document.getElementById('fechaFin').value = '';
-
-                // Limpiar los checkboxes
-                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.checked = false;
-                });
+            <label for="fechaFin">Fecha de fin:</label>
+            <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?= $fechaFin ?>">
+        `;
             }
-        </script>
-    <?php endif; ?>
+
+        });
+    </script>
 </body>
 
 </html>
