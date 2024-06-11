@@ -82,14 +82,7 @@ function editar_registro()
     echo "<script>window.location.href = '../views/user.php?section=editar';</script>";
 }
 
-/**
- * Function to desactivate a record from the database.
- *
- * This function updates the 'estado' column of the 'user' table to 'Inactivo' for the specified ID.
- * After deleting the record, it redirects the user to the 'user.php' page.
- *
- * @return void
- */
+
 function eliminar_registro()
 {
     global $pdo;
@@ -103,37 +96,6 @@ function eliminar_registro()
     echo "<script>alert('Usuario desactivado exitosamente.');</script>";
     echo "<script>window.location.href = '../views/user.php?section=elimniar';</script>";
 }
-
-// function acceso_user()
-// {
-//     global $pdo;
-//     $correo = $_POST['correo'];
-//     $password = $_POST['password'];
-//     session_start();
-//     $_SESSION['correo'] = $correo;
-
-//     $consulta = "SELECT * FROM public.user WHERE correo=:correo AND password=:password";
-//     $stmt = $pdo->prepare($consulta);
-//     $stmt->bindParam(':correo', $correo, PDO::PARAM_STR);
-//     $stmt->bindParam(':password', $password, PDO::PARAM_STR);
-//     $stmt->execute();
-//     $filas = $stmt->fetch(PDO::FETCH_ASSOC);
-
-//     if($filas['rol_id'] == 'add38db6-1687-4e57-a763-a959400d9da2'){ //admin
-
-//         header('Location: ../views/user.php');
-
-//     }else if($filas['rol_id'] == 'e17a74c4-9627-443c-b020-23dc4818b718'){//Usuario
-//         header('Location: ../views/lector.php');
-//     }
-//     else if($filas['rol_id'] == 'ad2e8033-4a14-40d6-a999-1f1c6467a5e6'){//Analista de Datos
-//         header('Location: ../views/analista.php');
-
-//     }else{
-//         $_SESSION['error_login'] = 'Usuario o contraseña incorrectos';
-//         header('Location: ../includes/login.php');
-//     }
-// }
 
 function acceso_user()
 {
@@ -192,7 +154,7 @@ function solicitar_recuperacion()
     $correo = $_POST['correo'];
 
     try {
-        $consulta = "SELECT password FROM public.user WHERE correo = :correo";
+        $consulta = "SELECT nombre, apellido, password FROM public.user WHERE correo = :correo";
         $stmt = $pdo->prepare($consulta);
         $stmt->execute(['correo' => $correo]);
         $usuario = $stmt->fetch();
@@ -205,23 +167,47 @@ function solicitar_recuperacion()
             $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $key, 0, $iv);
 
             $asunto = "Recuperacion de clave del Cuadro de Mando y Gestion";
-            $mensaje = "Tu clave es: " . $password;
+            $mensaje = "<img src='cid:logo_ecu911'> <br>" . "Hola " . $usuario['nombre'] . " " . $usuario['apellido'] . ",<br>Tu clave para acceder al sistema es: " . $password . "<br><br>";
 
             // Configuracion del srservidor SMTP
             $mail = new PHPMailer(false);
             $mail->isSMTP();
-            $mail->Host = 'MAIL02ECU911.ecu911.int';  // Reemplaza con tu servidor SMTP (ej: smtp.gmail.com)
+            $mail->Host = 'MAIL02ECU911.ecu911.int';
             $mail->SMTPAuth = false;
             $mail->Username = 'ecu911\proyectos';
             $mail->Password = 'R3p0$1+0r103cu9ii';
             $mail->SMTPAutoTLS = false;
-            $mail->SMTPSecure = false;  // O 'ssl' si es necesario
+            $mail->SMTPSecure = false;
             $mail->Port = 25;
 
             // Configuración del mensaje
             $mail->setFrom('ecu911.team.proyectos@ecu911.gob.ec', 'SIS ECU 911'); // Reemplaza con tus datos
             $mail->addAddress($correo);
             $mail->Subject = $asunto;
+            $mail->isHTML(true);
+
+            // Cargar, redimensionar e incrustar la imagen
+            $logoPath = '../dist/img/ecu911mail.png';
+            list($width, $height) = getimagesize($logoPath);
+            $maxWidth = 500;
+            $maxHeight = 250;
+
+            if ($width > $maxWidth || $height > $maxHeight) {
+                $ratio = min($maxWidth / $width, $maxHeight / $height);
+                $newWidth = $width * $ratio;
+                $newHeight = $height * $ratio;
+                $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                $originalImage = imagecreatefrompng($logoPath);
+                imagecopyresampled($newImage, $originalImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                ob_start();
+                imagepng($newImage);
+                $imageData = ob_get_clean();
+                $mail->addStringEmbeddedImage($imageData, 'logo_ecu911', 'logo_ecu911.png');
+            } else {
+                $newWidth = $width;
+                $newHeight = $height;
+                $mail->addEmbeddedImage($logoPath, 'logo_ecu911', 'logo_ecu911.png');
+            }
             $mail->Body = $mensaje;
 
             // Enviar el correo

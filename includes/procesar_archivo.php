@@ -241,9 +241,10 @@ if ($validar == null || $validar == '') {
 
                                     echo '</tbody>';
                                     echo '</table>';
-
+                                    echo '<div class="mb-3">';
                                     echo '<input type="submit" class="btn btn-block bg-gradient-success" name="registrar_centro" value="Subir información">';
                                     echo '<a class="btn btn-block bg-gradient-danger" href="javascript:void(0);" onclick="history.back();">Cancelar</a>';
+                                    echo '</div>';
                                     echo '</form>';
                                 }
                             } else {

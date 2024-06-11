@@ -43,6 +43,31 @@ $query_ultimo_registro = "SELECT MAX(created_at) AS ultima_fecha FROM public.reg
 $stmt_ultimo = $pdo->query($query_ultimo_registro);
 $ultimo_registro = $stmt_ultimo->fetch(PDO::FETCH_ASSOC);
 
+if ($ultimo_registro) {
+    $ultima_fecha = new DateTime($ultimo_registro['ultima_fecha']);
+    $mes_ultima = $ultima_fecha->format('F'); // Obtiene el nombre del mes en inglés
+    $anio_ultima = $ultima_fecha->format('Y'); // Obtiene el año
+
+    // Array para traducir los nombres de los meses del inglés al español
+    $meses = [
+        'January' => 'Enero',
+        'February' => 'Febrero',
+        'March' => 'Marzo',
+        'April' => 'Abril',
+        'May' => 'Mayo',
+        'June' => 'Junio',
+        'July' => 'Julio',
+        'August' => 'Agosto',
+        'September' => 'Septiembre',
+        'October' => 'Octubre',
+        'November' => 'Noviembre',
+        'December' => 'Diciembre'
+    ];
+
+    // Traduce el nombre del mes
+    $mes_ultima_es = $meses[$mes_ultima];
+}
+
 $fecha_ultima = $ultimo_registro['ultima_fecha'];
 $mes_ultima = date('F', strtotime($fecha_ultima)); // Nombre del mes en inglés
 $anio_ultima = date('Y', strtotime($fecha_ultima));
@@ -415,8 +440,8 @@ $apellido_usuario = $datos_usuario['apellido'];
                                 <div class="card-body">
                                     <div id="filter-container">
                                         <div class="container mt-12">
-                                            <h2> Estadisticas</h2>
-                                            <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                                            <h2>Estadísticas</h2>
+                                            <p>De <?php echo $mes_ultima_es . ' del ' . $anio_ultima; ?></p>
 
                                             <table id="example1" class="table table-bordered table-hover table-responsive">
                                                 <thead>
@@ -518,7 +543,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                         </div>
                                         <div class="container mt-12">
                                             <h2>Observaciones</h2>
-                                            <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                                            <p>De <?php echo $mes_ultima_es . ' del ' . $anio_ultima; ?></p>
                                             <table id="example1" class="table table-bordered table-hover table-responsive">
                                                 <thead>
                                                     <tr>

@@ -415,12 +415,8 @@ $apellido_usuario = $datos_usuario['apellido'];
       </div>
       <!-- /.sidebar -->
     </aside>
-
-    <!-- Content Wrapper. Contains page content -->
     <br>
     <div class="content-wrapper">
-      <!-- /.content-header -->
-      <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
           <div class="row">
@@ -459,55 +455,56 @@ $apellido_usuario = $datos_usuario['apellido'];
                       </div>
                       <button type="submit" class="btn btn-primary">Filtrar</button>
                     </form>
-                    <form action="../includes/_functions.php" method="POST">
-                      <table id="example1" class="table table-bordered table-striped table-responsive">
-                        <thead>
-                          <tr>
-                            <th colspan="2">Datos Generales</th>
-                            <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
-                            <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
-                            <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
-                          </tr>
-                          <tr>
-                            <th>Mes</th>
-                            <th>Centro</th>
-                            <th>% de Convenios Estratégicos Reportados (10%)</th>
-                            <th>% de Compromisos institucionales cumplidos (10%)</th>
-                            <th>% de Operatividad de cámaras (20%)</th>
-                            <th>% de Ausentismo Operativo (20%)</th>
-                            <th>% de Cumplimiento Mobile Locator (10%)</th>
-                            <th>% Incumplimiento de disposiciones (20%)</th>
-                            <th>% Comunicación Estratégica (10%)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <?php
-                          if ($stmt->rowCount() > 0) {
-                            while ($row = $stmt->fetch()) {
-                              echo "<tr>";
-                              echo "<td>" . $row['mes_creado'] . "</td>";
-                              echo "<td>" . $row['nombre_centro'] . "</td>";
-                              // Campos con nombres de array y valores precargados
-                              echo "<input type='hidden' name='id_registro[]' value='" . $row['id_registro'] . "'>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='conve_stra[]' value='" . $row['conve_stra'] . "' min='0' max='10' step='0.01' ></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='comp_insti[]' value='" . $row['comp_insti'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='opera_cam[]' value='" . $row['opera_cam'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='ausentimo[]' value='" . $row['ausentimo'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none'name='mobile_locator[]' value='" . $row['mobile_locator'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='dispoci[]' value='" . $row['dispoci'] . "' min='0' max='100' step='0.01'></td>";
-                              echo "<td><input type='number' style='background-color:transparent; border:none' name='com_estra[]' value='" . $row['com_estra'] . "' min='0' max='100'step='0.01'></td>";
-
-                              echo "</tr>\n";
+                    <?php if (isset($_GET['centro']) && !empty($_GET['centro']) && isset($_GET['filterType']) && !empty($_GET['filterType'])) : ?>
+                      <form action="../includes/_functions.php" method="POST">
+                        <table id="example1" class="table table-bordered table-striped table-responsive">
+                          <thead>
+                            <tr>
+                              <th colspan="2">Datos Generales</th>
+                              <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
+                              <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
+                              <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
+                            </tr>
+                            <tr>
+                              <th>Mes</th>
+                              <th>Centro</th>
+                              <th>% de Convenios Estratégicos Reportados (10%)</th>
+                              <th>% de Compromisos institucionales cumplidos (10%)</th>
+                              <th>% de Operatividad de cámaras (20%)</th>
+                              <th>% de Ausentismo Operativo (20%)</th>
+                              <th>% de Cumplimiento Mobile Locator (10%)</th>
+                              <th>% Incumplimiento de disposiciones (20%)</th>
+                              <th>% Comunicación Estratégica (10%)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <?php
+                            if ($stmt->rowCount() > 0) {
+                              while ($row = $stmt->fetch()) {
+                                echo "<tr>";
+                                echo "<td>" . $row['mes_creado'] . "</td>";
+                                echo "<td>" . $row['nombre_centro'] . "</td>";
+                                // Campos con nombres de array y valores precargados
+                                echo "<input type='hidden' name='id_registro[]' value='" . $row['id_registro'] . "'>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='conve_stra[]' value='" . $row['conve_stra'] . "' min='0' max='10' step='0.01' ></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='comp_insti[]' value='" . $row['comp_insti'] . "' min='0' max='100' step='0.01'></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='opera_cam[]' value='" . $row['opera_cam'] . "' min='0' max='100' step='0.01'></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='ausentimo[]' value='" . $row['ausentimo'] . "' min='0' max='100' step='0.01'></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none'name='mobile_locator[]' value='" . $row['mobile_locator'] . "' min='0' max='100' step='0.01'></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='dispoci[]' value='" . $row['dispoci'] . "' min='0' max='100' step='0.01'></td>";
+                                echo "<td><input type='number' style='background-color:transparent; border:none' name='com_estra[]' value='" . $row['com_estra'] . "' min='0' max='100'step='0.01'></td>";
+                                echo "</tr>\n";
+                              }
+                            } else {
+                              echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
                             }
-                          } else {
-                            echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
-                          }
-                          ?>
-                        </tbody>
-                      </table>
-                      <input type="hidden" name="accion" value="actualizar_registro">
-                      <button type="submit" class="btn btn-primary">Editar</button>
-                    </form>
+                            ?>
+                          </tbody>
+                        </table>
+                        <input type="hidden" name="accion" value="actualizar_registro">
+                        <button type="submit" class="btn btn-primary">Editar</button>
+                      </form>
+                    <?php endif; ?>
                   </div>
                   <div id="content-container"></div>
                 </div>
@@ -615,7 +612,30 @@ $apellido_usuario = $datos_usuario['apellido'];
         "lengthChange": true,
         "autoWidth": true,
         "scrollX": true,
-
+        "language": {
+          "decimal": "",
+          "emptyTable": "No hay datos disponibles en la tabla",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+          "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+          "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "No se encontraron registros coincidentes",
+          "paginate": {
+            "first": "Primero",
+            "last": "Último",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          },
+          "aria": {
+            "sortAscending": ": activar para ordenar la columna ascendente",
+            "sortDescending": ": activar para ordenar la columna descendente"
+          }
+        }
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
   </script>

@@ -694,7 +694,7 @@ $apellido_usuario = $datos_usuario['apellido'];
             $(function() {
                 var nombresMeses = <?php echo json_encode($nombresMeses); ?>;
                 var datosGrafica = <?php echo json_encode(array_values($datosGrafica)); ?>;
-                var colores = ['rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 165, 0, 0.5)', 'rgba(75, 0, 130, 0.5)', 'rgba(255, 255, 0, 1)', 'rgba(255, 0, 255, 1)', 'rgba(0, 255, 255, 1)', 'rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 1)', 'rgba(128, 0, 0, 1)', 'rgba(128, 128, 0, 1)', 'rgba(0, 128, 0, 1)', 'rgba(128, 0, 128, 1)', 'rgba(0, 128, 128, 1)', 'rgba(192, 192, 192, 1)', 'rgba(255, 165, 0, 1)']; // Añadir más colores si hay más centros
+                var colores = ['rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 165, 0, 0.5)', 'rgba(75, 0, 130, 0.5)', 'rgba(255, 255, 0, 1)', 'rgba(255, 0, 255, 1)']; // Añadir más colores si hay más centros
 
                 function crearGrafico(canvasId, tipo) {
                     var datasets = [];

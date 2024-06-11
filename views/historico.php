@@ -468,7 +468,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                         ?>
                                         <div id="filter-container">
                                             <div class="col-md-10">
-                                                <h2>Historico individual de los centros nacionales</h2>
+                                                <h2>Histórico individual de los centros nacionales</h2>
                                             </div>
                                             <div class="col-md-3">
                                                 <form id="filterForm" class="mb-2" method="GET">

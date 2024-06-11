@@ -429,7 +429,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="container mt-5" id="filter-container">
-                                        <h2 class="mb-4">Filtro de registros por centro</h2>
+                                        <h2 class="mb-4">Filtro de observaciones por centro</h2>
                                         <form id="filterForm" class="mb-4" method="GET">
                                             <div class="form-group">
                                                 <label for="centroSelect">Seleccione un centro:</label>
@@ -459,53 +459,56 @@ $apellido_usuario = $datos_usuario['apellido'];
                                             </div>
                                             <button type="submit" class="btn btn-primary">Filtrar</button>
                                         </form>
-                                        <form action="../includes/_functions.php" method="POST">
-                                            <table id="example1" class="table table-bordered table-striped table-responsive">
-                                                <thead>
-                                                    <tr>
-                                                        <th colspan="2">Datos Generales</th>
-                                                        <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
-                                                        <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
-                                                        <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Mes</th>
-                                                        <th>Centro</th>
-                                                        <th>% de Convenios Estratégicos Reportados (10%)</th>
-                                                        <th>% de Compromisos institucionales cumplidos (10%)</th>
-                                                        <th>% de Operatividad de cámaras (20%)</th>
-                                                        <th>% de Ausentismo Operativo (20%)</th>
-                                                        <th>% de Cumplimiento Mobile Locator (10%)</th>
-                                                        <th>% Incumplimiento de disposiciones (20%)</th>
-                                                        <th>% Comunicación Estratégica (10%)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    if ($stmt->rowCount() > 0) {
-                                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                            echo "<tr>";
-                                                            echo "<td>" . $row['mes_creado'] . "</td>";
-                                                            echo "<td>" . $row['nombre_centro'] . "</td>";
-                                                            echo "<td>" . $row['obv_conve_stra'] . "</td>";
-                                                            echo "<td>" . $row['obv_comp_insti'] . "</td>";
-                                                            echo "<td>" . $row['obv_opera_cam'] . "</td>";
-                                                            echo "<td>" . $row['obv_ausentimo'] . "</td>";
-                                                            echo "<td>" . $row['obv_mobile_locator'] . "</td>";
-                                                            echo "<td>" . $row['obv_dispoci'] . "</td>";
-                                                            echo "<td>" . $row['obv_com_estra'] . "</td>";
-                                                            echo "</tr>\n";
+                                        <?php if (isset($_GET['centro']) && !empty($_GET['centro']) && isset($_GET['filterType']) && !empty($_GET['filterType'])) : ?>
+                                            <form action="../includes/_functions.php" method="POST">
+                                                <table id="example1" class="table table-bordered table-striped table-responsive">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Datos Generales</th>
+                                                            <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
+                                                            <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
+                                                            <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Mes</th>
+                                                            <th>Centro</th>
+                                                            <th>% de Convenios Estratégicos Reportados (10%)</th>
+                                                            <th>% de Compromisos institucionales cumplidos (10%)</th>
+                                                            <th>% de Operatividad de cámaras (20%)</th>
+                                                            <th>% de Ausentismo Operativo (20%)</th>
+                                                            <th>% de Cumplimiento Mobile Locator (10%)</th>
+                                                            <th>% Incumplimiento de disposiciones (20%)</th>
+                                                            <th>% Comunicación Estratégica (10%)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        if ($stmt->rowCount() > 0) {
+                                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                                echo "<tr>";
+                                                                echo "<td>" . $row['mes_creado'] . "</td>";
+                                                                echo "<td>" . $row['nombre_centro'] . "</td>";
+                                                                echo "<td>" . $row['obv_conve_stra'] . "</td>";
+                                                                echo "<td>" . $row['obv_comp_insti'] . "</td>";
+                                                                echo "<td>" . $row['obv_opera_cam'] . "</td>";
+                                                                echo "<td>" . $row['obv_ausentimo'] . "</td>";
+                                                                echo "<td>" . $row['obv_mobile_locator'] . "</td>";
+                                                                echo "<td>" . $row['obv_dispoci'] . "</td>";
+                                                                echo "<td>" . $row['obv_com_estra'] . "</td>";
+                                                                echo "</tr>\n";
+                                                            }
+                                                        } else {
+                                                            echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
                                                         }
-                                                    } else {
-                                                        echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
-                                                    }
-                                                    ?>
-                                                </tbody>
-                                            </table>
-                                            <input type="hidden" name="accion" value="actualizar_registro">
-                                            <button type="submit" class="btn btn-primary">Editar</button>
-                                        </form>
+                                                        ?>
+                                                    </tbody>
+                                                </table>
+                                                <input type="hidden" name="accion" value="actualizar_registro">
+                                                <button type="submit" class="btn btn-primary">Editar</button>
+                                            </form>
+                                        <?php endif; ?>
                                     </div>
+
                                     <div id="content-container"></div>
                                 </div>
                             </div>
@@ -613,7 +616,30 @@ $apellido_usuario = $datos_usuario['apellido'];
                 "lengthChange": true,
                 "autoWidth": true,
                 "scrollX": true,
-
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay datos disponibles en la tabla",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                    "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "No se encontraron registros coincidentes",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending": ": activar para ordenar la columna ascendente",
+                        "sortDescending": ": activar para ordenar la columna descendente"
+                    }
+                }
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>

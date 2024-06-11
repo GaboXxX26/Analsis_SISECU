@@ -33,9 +33,9 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['user.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php']
 
 ];
 
@@ -55,19 +55,6 @@ $stmt->execute();
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="es-MX">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registros</title>
-    <link rel="icon" type="image/x-icon" href="../Resources/images/ECU911.png" />
-    <link rel="stylesheet" href="../css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/es.css">
-</head>
 
 <body id="page-top">
     <form action="../includes/_functions.php" method="POST">
@@ -157,7 +144,6 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <input type="hidden" name="accion" value="editar_registro">
                                 <input type="hidden" name="id" value="<?php echo $id; ?>">
                             </div>
-
                             <div class="form-group">
                                 <label for="estado" class="form-label">Estado:</label>
                                 <select id="estado" name="estado" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" <?php echo $usuario['estado']; ?>>
@@ -165,11 +151,10 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                                     <option value="Inactivo" <?php echo ($usuario['estado'] == 'Inactivo') ? 'selected' : ''; ?>>Inactivo</option>
                                 </select>
                             </div>
-
                             <br>
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-success">Editar</button>
-                                <a class="btn btn-danger" href="javascript:void(0);" onclick="history.back();">Cancelar</a>                           
+                                <a class="btn btn-danger" href="./user.php">Cancelar</a>
                             </div>
                         </div>
                     </div>
@@ -177,17 +162,4 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
             </div>
         </div>
     </form>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const validacionExitosa = document.getElementById('validacion-exitosa').value === 'true';
-            if (!validacionExitosa) {
-                const errores = JSON.parse(document.getElementById('errores-validacion').value);
-                alert('Error en la validación del archivo:\n' + errores.join('\n'));
-                // Redirigir a la página anterior
-                history.back();
-            }
-        });
-    </script>
 </body>
-
-</html>

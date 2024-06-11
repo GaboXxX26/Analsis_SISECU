@@ -33,9 +33,9 @@ $_SESSION['rol_id'] = $usuario['rol_id'];
 
 // Definir permisos por rol
 $permisos = [
-    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php'],
-    'e17a74c4-9627-443c-b020-23dc4818b718' => ['lector.php', 'tabla_admin.php'],
-    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['analista.php']
+    'add38db6-1687-4e57-a763-a959400d9da2' => ['user.php', 'eliminar_user.php', 'editar_user.php', 'tabla_admin.php', 'historico.php', 'comparativo.php'],
+    'e17a74c4-9627-443c-b020-23dc4818b718' => ['user.php', 'tabla_admin.php'],
+    'ad2e8033-4a14-40d6-a999-1f1c6467a5e6' => ['user.php']
 
 ];
 
@@ -69,19 +69,8 @@ if (!isset($_SESSION['correo']) || empty($_SESSION['correo'])) {
                 <input type="hidden" name="accion" value="eliminar_registro">
                 <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
                 <input type="submit" name="" value="Desactivar" class=" btn btn-danger">
-                <a class="btn btn-success" href="javascript:void(0);" onclick="history.back();">Cancelar</a>
+                <a class="btn btn-success" href="./user.php" >Cancelar</a>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const validacionExitosa = document.getElementById('validacion-exitosa').value === 'true';
-        if (!validacionExitosa) {
-            const errores = JSON.parse(document.getElementById('errores-validacion').value);
-            alert('Error en la validación del archivo:\n' + errores.join('\n'));
-            history.back();
-        }
-    });
-</script>

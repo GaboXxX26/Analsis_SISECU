@@ -24,6 +24,10 @@ error_reporting(0);
 
                 $parametroAnterior = 100; // Valor inicial para el primer parámetro
 
+                // Valores predefinidos para la columna "Propiedades"
+                $propiedades = ["Alto", "Plan mejora", "Bajo", "Deficiente"];
+                $propiedadIndex = 0;
+
                 if ($stmt->rowCount() > 0) {
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $parametroActual = $row['parametro'];
@@ -37,10 +41,15 @@ error_reporting(0);
                         echo "<td><input type='number' class='form-control' name='parametro_{$row['id']}' value='" . $row['parametro'] . "' min='0' max='100' ></td>";
                         echo "<td><label >$textoLabel</label></td>";
                         echo "<td><input type='color' class='form-control' name='color_{$row['id']}' value='" . $row['color'] . "'></td>";
-                        echo "<td><label >{$row['nombre']}</label></td>";
+                        echo "<td><label>{$propiedades[$propiedadIndex]}</label></td>"; // Agrega la columna "Propiedades"
+
                         echo "</tr>\n";
 
                         $parametroAnterior = $parametroActual;
+                        $propiedadIndex++;
+                        if ($propiedadIndex >= count($propiedades)) {
+                            $propiedadIndex = 0;
+                        }
                     }
                 }
                 ?>

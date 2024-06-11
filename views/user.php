@@ -163,6 +163,31 @@ $query_ultimo_registro = "SELECT MAX(created_at) AS ultima_fecha FROM public.reg
 $stmt_ultimo = $pdo->query($query_ultimo_registro);
 $ultimo_registro = $stmt_ultimo->fetch(PDO::FETCH_ASSOC);
 
+if ($ultimo_registro) {
+  $ultima_fecha = new DateTime($ultimo_registro['ultima_fecha']);
+  $mes_ultima = $ultima_fecha->format('F'); // Obtiene el nombre del mes en inglés
+  $anio_ultima = $ultima_fecha->format('Y'); // Obtiene el año
+
+  // Array para traducir los nombres de los meses del inglés al español
+  $meses = [
+    'January' => 'Enero',
+    'February' => 'Febrero',
+    'March' => 'Marzo',
+    'April' => 'Abril',
+    'May' => 'Mayo',
+    'June' => 'Junio',
+    'July' => 'Julio',
+    'August' => 'Agosto',
+    'September' => 'Septiembre',
+    'October' => 'Octubre',
+    'November' => 'Noviembre',
+    'December' => 'Diciembre'
+  ];
+
+  // Traduce el nombre del mes
+  $mes_ultima_es = $meses[$mes_ultima];
+}
+
 $fecha_ultima = $ultimo_registro['ultima_fecha'];
 $mes_ultima = date('F', strtotime($fecha_ultima)); // Nombre del mes en inglés
 $anio_ultima = date('Y', strtotime($fecha_ultima));
@@ -502,8 +527,8 @@ $anio_ultima = date('Y', strtotime($fecha_ultima));
                 <div id="chart-container">
                   <div class="card-body">
                     <div class="col-md-12">
-                      <h2>Informacion estadistica: </h2>
-                      <p>De <?php echo $mes_ultima . ' del ' . $anio_ultima; ?></p>
+                      <h2>Información estadística: </h2>
+                      <p>De <?php echo $mes_ultima_es . ' del ' . $anio_ultima; ?></p>
                       <div class="row">
                         <div class="col-md-3">
                           <div class="card card-success" style="height:25rem;">
