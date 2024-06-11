@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+    <link rel="stylesheet" href="../plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
 </head>
 
 <body class="hold-transition login-page">
@@ -35,10 +38,9 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <input type="hidden" name="accion" value="solicitar_recuperacion" >
-                            <button type="submit" class="btn btn-primary btn-block" >Enviar correo </button>
+                            <input type="hidden" name="accion" value="solicitar_recuperacion">
+                            <button type="submit" class="btn btn-success swalDefaultSuccess" id="enviarBtn">Enviar correo </button>
                         </div>
-                        <!-- /.col -->
                     </div>
                 </form>
                 <p class="mt-3 mb-1">
@@ -49,13 +51,43 @@
         </div>
     </div>
     <!-- /.login-box -->
-
     <!-- jQuery -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../dist/js/adminlte.min.js"></script>
+    <script src="../plugins/sweetalert2/sweetalert2.min.js"></script>
+
+    <script>
+        $(function() {
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 10000
+            });
+
+            $('.swalDefaultSuccess').click(function() {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Correo electrónico enviado con tu contraseña.'
+                })
+            });
+            
+        });
+    </script>
+
+    <script>
+        document.getElementById("enviarBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // Evitar el envío automático del formulario
+            this.disabled = true;
+            this.innerHTML = "Enviando...";
+
+            // Enviar el formulario manualmente
+            this.form.submit();
+        });
+    </script>
 </body>
 
 </html>

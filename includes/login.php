@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <input type="submit" class="btn btn-primary d-grid w-100s" value="Ingresar">
+                                <input type="submit" class="btn btn-primary d-grid w-100s swalDefaultSuccess" value="Ingresar">
                             </div>
                         </form>
                     </div>
@@ -76,6 +76,24 @@
     <script src="../Resources/vendor/js/menu.js"></script>
     <script src="../Resources/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        $(function() {
+            var Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 10000
+            });
+
+            $('.swalDefaultSuccess').click(function() {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Correo electrónico enviado con tu contraseña.'
+                })
+            });
+
+        });
+    </script>
 </body>
 
 </html>

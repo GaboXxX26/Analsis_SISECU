@@ -136,15 +136,24 @@ function acceso_user()
                 }
             } else {
                 $_SESSION['error_login'] = "Usuario o contraseña incorrectos.";
-                header('Location: ../includes/login.php');
+                echo "<script>
+                        alert('Usuario o contrasenia incorrecta');
+                        setTimeout(function() {
+                            window.location.href = '../includes/login.php';
+                        }, 1000);
+                    </script>";
             }
         } else {
+
             $_SESSION['error_login'] = "Usuario o contraseña incorrectos.";
-            header('Location: ../includes/login.php');
+            echo "<script>
+                    alert('Usuario o contrasenia incorrecta');
+                    setTimeout(function() {
+                        window.location.href = '../includes/login.php';
+                    }, 1000);
+                </script>";
         }
     } catch (PDOException $e) {
-        echo "Error en el inicio de sesión: " . $e->getMessage();
-        // Es buena práctica registrar el error en un log para depuración
     }
 }
 
@@ -169,7 +178,6 @@ function solicitar_recuperacion()
             $asunto = "Recuperacion de clave del Cuadro de Mando y Gestion";
             $mensaje = "<img src='cid:logo_ecu911'> <br>" . "Hola " . $usuario['nombre'] . " " . $usuario['apellido'] . ",<br>Tu clave para acceder al sistema es: " . $password . "<br><br>";
 
-            // Configuracion del srservidor SMTP
             $mail = new PHPMailer(false);
             $mail->isSMTP();
             $mail->Host = 'MAIL02ECU911.ecu911.int';
@@ -180,13 +188,12 @@ function solicitar_recuperacion()
             $mail->SMTPSecure = false;
             $mail->Port = 25;
 
-            // Configuración del mensaje
-            $mail->setFrom('ecu911.team.proyectos@ecu911.gob.ec', 'SIS ECU 911'); // Reemplaza con tus datos
+            $mail->setFrom('ecu911.team.proyectos@ecu911.gob.ec', 'SIS ECU 911');
             $mail->addAddress($correo);
             $mail->Subject = $asunto;
             $mail->isHTML(true);
 
-            // Cargar, redimensionar e incrustar la imagen
+            //dimensionar la imagen para cargar
             $logoPath = '../dist/img/ecu911mail.png';
             list($width, $height) = getimagesize($logoPath);
             $maxWidth = 500;
@@ -212,8 +219,8 @@ function solicitar_recuperacion()
 
             // Enviar el correo
             if ($mail->send()) {
-                echo "<script>alert('Correo electrónico enviado con tu contraseña.');</script>";
                 echo "<script>window.location.href = '../includes/login.php';</script>";
+
             } else {
                 echo "<script>alert('Error al enviar el correo: {$mail->ErrorInfo}');</script>";
             }
