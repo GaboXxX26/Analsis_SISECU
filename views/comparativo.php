@@ -448,14 +448,12 @@ $apellido_usuario = $datos_usuario['apellido'];
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <!-- /.card-header -->
                                 <div class="card-body">
                                     <br>
-
-                                    <h1> Filtro comparativo de centros</h1>
                                     <?php
                                     $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
                                     ?>
+                                    <h1> Filtro comparativo de centros</h1>
                                     <div class="col-md-3" id="filter-container">
                                         <form id="filterForm" class="mb-2" method="GET">
                                             <div class="form-group">

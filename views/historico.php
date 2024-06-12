@@ -46,13 +46,18 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
     die();
 }
 
-// Get the selected filters from the form
+// Obtener los filtros seleccionados del formulario
 $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
+$tipoFiltro = isset($_GET['tipoFiltro']) ? $_GET['tipoFiltro'] : '';
+$anio = isset($_GET['anio']) ? $_GET['anio'] : '';
+$mes = isset($_GET['mes']) ? $_GET['mes'] : '';
+$trimestre = isset($_GET['trimestre']) ? $_GET['trimestre'] : '';
 $fechaInicio = isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
 $fechaFin = isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
+
 // Obtener el nombre del centro seleccionado
 $nombreCentro = '';
-if (!empty($selectedCentro)) {
+if (!empty($selectedCentro) && $selectedCentro != 'todos') {
     $queryCentroNombre = "SELECT nombre_centro FROM centro WHERE id_centro = :selectedCentro";
     $stmtCentroNombre = $pdo->prepare($queryCentroNombre);
     $stmtCentroNombre->execute(['selectedCentro' => $selectedCentro]);
@@ -61,25 +66,45 @@ if (!empty($selectedCentro)) {
     }
 }
 
-// Build the SQL query with optional conditions
+// Construir la consulta SQL con condiciones opcionales
 $consulta = "SELECT TO_CHAR(r.created_at, 'TMMonth') AS nombre_mes, r.id_registro, c.nombre_centro, r.conve_stra, r.comp_insti, r.opera_cam, r.ausentimo, r.mobile_locator, r.dispoci, r.com_estra, TO_CHAR(r.created_at, 'MM') AS mes_creado
                 FROM public.registros AS r 
                 LEFT JOIN centro AS c ON c.id_centro = r.id_centro 
                 WHERE 1=1 ";
 $params = [];
 
-// Apply filters dynamically
-if (!empty($selectedCentro)) {
+// Aplicar filtros dinámicamente
+if (!empty($selectedCentro) && $selectedCentro != 'todos') {
     $consulta .= " AND r.id_centro = :selectedCentro";
     $params['selectedCentro'] = $selectedCentro;
 }
-if (!empty($fechaInicio) && !empty($fechaFin)) {
-    $fechaInicio .= ' 00:00:00';
-    $fechaFin .= ' 23:59:59';
-    $consulta .= " AND r.created_at BETWEEN :fechaInicio AND :fechaFin";
-    $params['fechaInicio'] = $fechaInicio;
-    $params['fechaFin'] = $fechaFin;
+
+switch ($tipoFiltro) {
+    case 'mensual':
+        if (!empty($anio) && !empty($mes)) {
+            $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = :anio AND EXTRACT(MONTH FROM r.created_at) = :mes";
+            $params['anio'] = $anio;
+            $params['mes'] = $mes;
+        }
+        break;
+    case 'trimestral':
+        if (!empty($trimestre)) {
+            $consulta .= " AND EXTRACT(QUARTER FROM r.created_at) = :trimestre";
+            $params['trimestre'] = $trimestre;
+        }
+        break;
+    case 'rango':
+        if (!empty($fechaInicio) && !empty($fechaFin)) {
+            $fechaInicio .= ' 00:00:00';
+            $fechaFin .= ' 23:59:59';
+            $consulta .= " AND r.created_at BETWEEN :fechaInicio AND :fechaFin";
+            $params['fechaInicio'] = $fechaInicio;
+            $params['fechaFin'] = $fechaFin;
+        }
+        break;
 }
+
+// Ordenar por fecha de creación
 $consulta .= " ORDER BY r.created_at";  // Añadir ordenamiento al final de la consulta
 
 // Prepare and execute the query
@@ -93,6 +118,12 @@ $promediosOperativa = [];
 $promediosCalidad = [];
 $totalesCumplimiento = [];
 
+$total_gestion = 0;
+$total_operativa = 0;
+$total_calidad = 0;
+$total_cumplimiento_gestion = 0;
+$total_centros = 0;
+
 if ($stmt->rowCount() > 0) {
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $mes = $row['nombre_mes'];
@@ -104,6 +135,7 @@ if ($stmt->rowCount() > 0) {
                 'promedio_calidad' => 0
             ];
         }
+
         $promedio_gestion = ($row['conve_stra'] + $row['comp_insti']);
         $promedio_operativa = ($row['opera_cam'] + $row['ausentimo'] + $row['mobile_locator']);
         $promedio_calidad = ($row['dispoci'] + $row['com_estra']);
@@ -118,7 +150,26 @@ if ($stmt->rowCount() > 0) {
         $promediosGestion[] = $promedio_gestion_formatted;
         $promediosOperativa[] = $promedio_operativa_formatted;
         $promediosCalidad[] = $promedio_calidad_formatted;
+
+        // Sumar los promedios al total nacional
+        $total_gestion += $promedio_gestion;
+        $total_operativa += $promedio_operativa;
+        $total_calidad += $promedio_calidad;
+        $total_cumplimiento_gestion += $suma_total_centro;
+        $total_centros++;
     }
+
+    // Calcular los promedios nacionales
+    $promedio_nacional_gestion = $total_gestion / $total_centros;
+    $promedio_nacional_operativa = $total_operativa / $total_centros;
+    $promedio_nacional_calidad = $total_calidad / $total_centros;
+    $promedio_nacional_cumplimiento_gestion = $total_cumplimiento_gestion / $total_centros;
+
+    // Formatear los promedios nacionales para los gráficos
+    $promNacionalGestion = number_format($promedio_nacional_gestion, 2);
+    $promNacionalOperativa = number_format($promedio_nacional_operativa, 2);
+    $promNacionalCalidad = number_format($promedio_nacional_calidad, 2);
+    $promNacionalCumplimiento = number_format($promedio_nacional_cumplimiento_gestion, 2);
 }
 
 $query_rol = "SELECT rol FROM permisos WHERE id = :id";
@@ -460,62 +511,168 @@ $apellido_usuario = $datos_usuario['apellido'];
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <!-- /.card-header -->
                                 <div class="card-body">
-                                    <div class="container mt-12">
-                                        <?php
-                                        $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
-                                        ?>
-                                        <div id="filter-container">
-                                            <div class="col-md-10">
-                                                <h2>Histórico individual de los centros nacionales</h2>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <form id="filterForm" class="mb-2" method="GET">
-                                                    <div class="form-group">
-                                                        <label for="centroSelect">Seleccione un centro:</label>
-                                                        <select id="centroSelect" name="centro" class="form-control" required>
-                                                            <option value="">Seleccione un centro</option>
-                                                            <?php
-                                                            $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
-                                                            $stmtCentros = $pdo->query($queryCentros);
-                                                            $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
+                                    <?php
+                                    $hayFiltrosIngresados = !empty($_GET['tipoFiltro']) || !empty($_GET['fechaInicio']) || !empty($_GET['fechaFin']) || !empty($_GET['centro']);
+                                    ?>
+                                    <div id="filter-container">
+                                        <h2>Histórico individual de los centros nacionales</h2>
+                                        <div class="col-md-3">
+                                            <form id="filterForm" class="mb-2" method="GET">
+                                                <div class="form-group">
+                                                    <label for="centroSelect">Seleccione un centro:</label>
+                                                    <select id="centroSelect" name="centro" class="form-control" required>
+                                                        <option value="">Seleccione un centro</option>
+                                                        <option value="todos" <?php echo isset($_GET['centro']) && $_GET['centro'] == 'todos' ? 'selected' : ''; ?>>Nacional</option>
+                                                        <?php
+                                                        $queryCentros = "SELECT id_centro, nombre_centro FROM centro";
+                                                        $stmtCentros = $pdo->query($queryCentros);
+                                                        $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
 
-                                                            while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
-                                                                $isSelected = $rowCentro['id_centro'] == $selectedCentro ? 'selected' : '';
-                                                                echo "<option value='{$rowCentro['id_centro']}' $isSelected>{$rowCentro['nombre_centro']}</option>";
+                                                        while ($rowCentro = $stmtCentros->fetch(PDO::FETCH_ASSOC)) {
+                                                            $isSelected = $rowCentro['id_centro'] == $selectedCentro ? 'selected' : '';
+                                                            echo "<option value='{$rowCentro['id_centro']}' $isSelected>{$rowCentro['nombre_centro']}</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+
+                                                    <label for="tipoFiltro">Tipo de filtro:</label>
+                                                    <select id="tipoFiltro" name="tipoFiltro" class="form-control" required onchange="mostrarFiltros()">
+                                                        <option value="">Seleccione el tipo de filtro</option>
+                                                        <option value="mensual" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'mensual' ? 'selected' : ''; ?>>Anual</option>
+                                                        <option value="trimestral" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'trimestral' ? 'selected' : ''; ?>>Trimestral</option>
+                                                        <option value="rango" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'rango' ? 'selected' : ''; ?>>Rango de fechas</option>
+                                                    </select>
+
+                                                    <div id="filtroMensual" style="display: none;">
+                                                        <label for="anio">Seleccione el año:</label>
+                                                        <select id="anio" name="anio" class="form-control">
+                                                            <option value="">Seleccione un año </option>
+                                                            <?php
+                                                            $currentYear = date("Y");
+                                                            for ($i = $currentYear; $i >= 2000; $i--) {
+                                                                echo "<option value='$i'>$i</option>";
                                                             }
                                                             ?>
                                                         </select>
+                                                    </div>
 
+                                                    <div id="filtroTrimestral" style="display: none;">
+                                                        <label for="trimestre">Seleccione el trimestre:</label>
+                                                        <select id="trimestre" name="trimestre" class="form-control">
+                                                            <option value="">Seleccione un trimestre </option>
+                                                            <option value="1">Primer trimestre (Enero - Marzo)</option>
+                                                            <option value="2">Segundo trimestre (Abril - Junio)</option>
+                                                            <option value="3">Tercer trimestre (Julio - Septiembre)</option>
+                                                            <option value="4">Cuarto trimestre (Octubre - Diciembre)</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div id="filtroRangoFechas" style="display: none;">
                                                         <label for="fechaInicio">Fecha de inicio:</label>
                                                         <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" value="<?php echo isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : ''; ?>">
 
                                                         <label for="fechaFin">Fecha de fin:</label>
                                                         <input type="date" id="fechaFin" name="fechaFin" class="form-control" value="<?php echo isset($_GET['fechaFin']) ? $_GET['fechaFin'] : ''; ?>">
                                                     </div>
+                                                </div>
 
-                                                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                                                <button type="submit" class="btn btn-primary" id="filterButton">Filtrar</button>
 
-                                                    <?php if ($hayFiltrosIngresados) : ?>
-                                                        <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
-                                                    <?php endif; ?>
-                                                </form>
+                                                <?php if ($hayFiltrosIngresados) : ?>
+                                                    <button type="button" class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
+                                                <?php endif; ?>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10" id="individualChartContainer" style="display: none;">
+                                        <div class="card card-success">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Resultados <?php echo !empty($nombreCentro) ? " - Centro " . htmlspecialchars($nombreCentro) : ''; ?></h3>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="chart">
+                                                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-10" id="chart-container">
+                                    </div>
+                                    <div id="nationalChartContainer" style="display: none;">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="card card-success" style="height:25rem;">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Interinstitucional(20%)</h3>
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="chart">
+                                                            <canvas id="intChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                            <h2 class="text-center"><?php echo $promNacionalGestion; ?>%</h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card card-success" style="height:25rem;">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Operativa(50%)</h3>
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="chart">
+                                                            <canvas id="opeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                            <h1 class="text-center"><?php echo $promNacionalOperativa; ?>%</h1>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="card card-success" style="height:25rem;">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title ">Estratégica(30%)</h3>
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="chart">
+                                                            <canvas id="estraChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                            <h2 class="text-center"><?php echo $promNacionalCalidad; ?>%</h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
                                             <div class="card card-success">
                                                 <div class="card-header">
-                                                    <h3 class="card-title">Resultados <?php echo !empty($nombreCentro) ? " - Centro " . htmlspecialchars($nombreCentro) : ''; ?></h3>
+                                                    <h3 class="card-title">Total Nacional (100%)</h3>
                                                     <div class="card-tools">
                                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                                             <i class="fas fa-minus"></i>
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div class="card-body">
+                                                <div class="card-body" id="chart-container">
                                                     <div class="chart">
-                                                        <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                        <canvas id="nacionalChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                        <h2 class="text-center"><?php echo $promNacionalCumplimiento; ?>%</h2>
                                                     </div>
                                                 </div>
                                             </div>
@@ -586,6 +743,39 @@ $apellido_usuario = $datos_usuario['apellido'];
     <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- Page specific script -->
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.getElementById('filterForm');
+            const filterButton = document.getElementById('filterButton');
+            const centroSelect = document.getElementById('centroSelect');
+            const individualChartContainer = document.getElementById('individualChartContainer');
+            const nationalChartContainer = document.getElementById('nationalChartContainer');
+
+            function toggleCharts() {
+                const selectedCentro = centroSelect.value;
+                if (selectedCentro === 'todos') {
+                    individualChartContainer.style.display = 'none';
+                    nationalChartContainer.style.display = 'block';
+                } else if (selectedCentro !== '') {
+                    individualChartContainer.style.display = 'block';
+                    nationalChartContainer.style.display = 'none';
+                } else {
+                    individualChartContainer.style.display = 'none';
+                    nationalChartContainer.style.display = 'none';
+                }
+            }
+
+            // Call the function on form submit
+            filterForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                toggleCharts();
+                filterForm.submit(); // Submit the form after handling the chart visibility
+            });
+
+            // Call the function on page load to set initial visibility
+            toggleCharts();
+        });
+    </script>
+    <script>
         function checkContent() {
             var contentContainer = document.getElementById('content-container');
             var filterContainer = document.getElementById('filter-container');
@@ -615,6 +805,17 @@ $apellido_usuario = $datos_usuario['apellido'];
             document.getElementById('filter-container').style.display = 'block';
             document.getElementById('chart-container').style.display = 'block';
         });
+    </script>
+    <script>
+        function mostrarFiltros() {
+            const tipoFiltro = document.getElementById('tipoFiltro').value;
+            document.getElementById('filtroMensual').style.display = (tipoFiltro === 'mensual') ? 'block' : 'none';
+            document.getElementById('filtroTrimestral').style.display = (tipoFiltro === 'trimestral') ? 'block' : 'none';
+            document.getElementById('filtroRangoFechas').style.display = (tipoFiltro === 'rango') ? 'block' : 'none';
+        }
+
+        // Llamar a la función mostrarFiltros al cargar la página para mantener el estado de los filtros visibles según el valor seleccionado previamente
+        document.addEventListener('DOMContentLoaded', mostrarFiltros);
     </script>
     <?php if ($hayFiltrosIngresados) : ?>
         <script>
@@ -717,16 +918,127 @@ $apellido_usuario = $datos_usuario['apellido'];
                 // Limpiar los valores de los input type date
                 document.getElementById('fechaInicio').value = '';
                 document.getElementById('fechaFin').value = '';
+                document.getElementById('tipoFiltro').value = '';
+                document.getElementById('anio').value = '';
+                document.getElementById('trimestre').value = '';
 
                 // Limpiar la selección del centro
                 document.getElementById('centroSelect').selectedIndex = 0;
-
-                // Limpiar los checkboxes
-                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.checked = false;
-                });
             }
+        </script>
+        <script>
+            $(function() {
+                var datosAnilloGestion = {
+                    labels: ['Gestión Interinstitucional 20%', ''], // Solo una etiqueta
+                    datasets: [{
+                        data: [<?php echo $promNacionalGestion; ?>, 20 - <?php echo $promNacionalGestion; ?>], // Valor real y valor restante
+                        backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+                        hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+
+                    }]
+                };
+
+                // Opciones del gráfico
+                var opcionesAnillo = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutoutPercentage: 75,
+                    rotation: -Math.PI,
+                    circumference: Math.PI
+                };
+
+                // Crear el gráfico de anillo en el canvas #intChart
+                new Chart(document.getElementById('intChart'), {
+                    type: 'doughnut',
+                    data: datosAnilloGestion, // Usar los datos específicos de gestión
+                    options: opcionesAnillo
+                });
+            });
+        </script>
+        <script>
+            $(function() {
+                var datosAnilloGestion = {
+                    labels: ['Gestión Operativa 50%', ''], // Solo una etiqueta
+                    datasets: [{
+                        data: [<?php echo $promNacionalOperativa; ?>, 50 - <?php echo $promNacionalOperativa; ?>], // Solo un valor
+                        backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+                        hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+                    }]
+                };
+
+                // Opciones del gráfico
+                var opcionesAnillo = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutoutPercentage: 75,
+                    rotation: -Math.PI,
+                    circumference: Math.PI,
+                };
+
+                // Crear el gráfico de anillo en el canvas #intChart
+                new Chart(document.getElementById('opeChart'), {
+                    type: 'doughnut',
+                    data: datosAnilloGestion, // Usar los datos específicos de gestión
+                    options: opcionesAnillo
+                });
+            });
+        </script>
+        <script>
+            $(function() {
+                var datosAnilloGestion = {
+                    labels: ['Gestión Estrategica 30%'], // Solo una etiqueta
+                    datasets: [{
+                        data: [<?php echo $promNacionalCalidad; ?>, 30 - <?php echo $promNacionalCalidad; ?>], // Solo un valor
+                        backgroundColor: ['#19DFD3 ', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+                        hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+
+                    }]
+                };
+
+                // Opciones del gráfico
+                var opcionesAnillo = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutoutPercentage: 75,
+                    rotation: -Math.PI,
+                    circumference: Math.PI
+                };
+
+                // Crear el gráfico de anillo en el canvas #intChart
+                new Chart(document.getElementById('estraChart'), {
+                    type: 'doughnut',
+                    data: datosAnilloGestion, // Usar los datos específicos de gestión
+                    options: opcionesAnillo
+                });
+            });
+        </script>
+        <script>
+            $(function() {
+                var datosAnilloGestion = {
+                    labels: ['Total Nacional (100%)'], // Solo una etiqueta
+                    datasets: [{
+                        data: [<?php echo $promNacionalCumplimiento; ?>, 100 - <?php echo $promNacionalCumplimiento; ?>], // Solo un valor
+                        backgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para la gestión y transparente para el resto
+                        hoverBackgroundColor: ['#19DFD3', 'rgba(0, 0, 0, 0)'], // Color para el hover
+                    }]
+                };
+
+                // Opciones del gráfico
+                var opcionesAnillo = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutoutPercentage: 75,
+                    rotation: -Math.PI,
+                    circumference: Math.PI
+                };
+
+                // Crear el gráfico de anillo en el canvas #intChart
+                new Chart(document.getElementById('nacionalChart'), {
+                    type: 'doughnut',
+                    data: datosAnilloGestion, // Usar los datos específicos de gestión
+                    options: opcionesAnillo
+                });
+            });
         </script>
     <?php endif; ?>
     <script>

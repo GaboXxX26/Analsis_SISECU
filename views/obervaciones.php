@@ -460,52 +460,49 @@ $apellido_usuario = $datos_usuario['apellido'];
                                             <button type="submit" class="btn btn-primary">Filtrar</button>
                                         </form>
                                         <?php if (isset($_GET['centro']) && !empty($_GET['centro']) && isset($_GET['filterType']) && !empty($_GET['filterType'])) : ?>
-                                            <form action="../includes/_functions.php" method="POST">
-                                                <table id="example1" class="table table-bordered table-striped table-responsive">
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="2">Datos Generales</th>
-                                                            <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
-                                                            <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
-                                                            <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Mes</th>
-                                                            <th>Centro</th>
-                                                            <th>% de Convenios Estratégicos Reportados (10%)</th>
-                                                            <th>% de Compromisos institucionales cumplidos (10%)</th>
-                                                            <th>% de Operatividad de cámaras (20%)</th>
-                                                            <th>% de Ausentismo Operativo (20%)</th>
-                                                            <th>% de Cumplimiento Mobile Locator (10%)</th>
-                                                            <th>% Incumplimiento de disposiciones (20%)</th>
-                                                            <th>% Comunicación Estratégica (10%)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php
-                                                        if ($stmt->rowCount() > 0) {
-                                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                                echo "<tr>";
-                                                                echo "<td>" . $row['mes_creado'] . "</td>";
-                                                                echo "<td>" . $row['nombre_centro'] . "</td>";
-                                                                echo "<td>" . $row['obv_conve_stra'] . "</td>";
-                                                                echo "<td>" . $row['obv_comp_insti'] . "</td>";
-                                                                echo "<td>" . $row['obv_opera_cam'] . "</td>";
-                                                                echo "<td>" . $row['obv_ausentimo'] . "</td>";
-                                                                echo "<td>" . $row['obv_mobile_locator'] . "</td>";
-                                                                echo "<td>" . $row['obv_dispoci'] . "</td>";
-                                                                echo "<td>" . $row['obv_com_estra'] . "</td>";
-                                                                echo "</tr>\n";
-                                                            }
-                                                        } else {
-                                                            echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
+                                            <table id="example1" class="table table-bordered table-striped table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="2">Datos Generales</th>
+                                                        <th colspan="2">Indicadores de Gestión Interinstitucional (20%)</th>
+                                                        <th colspan="3">Indicadores de Gestión Operativa (50%)</th>
+                                                        <th colspan="2">Indicadores de Gestión de Calidad (30%)</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Mes</th>
+                                                        <th>Centro</th>
+                                                        <th>% de Convenios Estratégicos Reportados (10%)</th>
+                                                        <th>% de Compromisos institucionales cumplidos (10%)</th>
+                                                        <th>% de Operatividad de cámaras (20%)</th>
+                                                        <th>% de Ausentismo Operativo (20%)</th>
+                                                        <th>% de Cumplimiento Mobile Locator (10%)</th>
+                                                        <th>% Incumplimiento de disposiciones (20%)</th>
+                                                        <th>% Comunicación Estratégica (10%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    if ($stmt->rowCount() > 0) {
+                                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                            echo "<tr>";
+                                                            echo "<td>" . $row['mes_creado'] . "</td>";
+                                                            echo "<td>" . $row['nombre_centro'] . "</td>";
+                                                            echo "<td>" . $row['obv_conve_stra'] . "</td>";
+                                                            echo "<td>" . $row['obv_comp_insti'] . "</td>";
+                                                            echo "<td>" . $row['obv_opera_cam'] . "</td>";
+                                                            echo "<td>" . $row['obv_ausentimo'] . "</td>";
+                                                            echo "<td>" . $row['obv_mobile_locator'] . "</td>";
+                                                            echo "<td>" . $row['obv_dispoci'] . "</td>";
+                                                            echo "<td>" . $row['obv_com_estra'] . "</td>";
+                                                            echo "</tr>\n";
                                                         }
-                                                        ?>
-                                                    </tbody>
-                                                </table>
-                                                <input type="hidden" name="accion" value="actualizar_registro">
-                                                <button type="submit" class="btn btn-primary">Editar</button>
-                                            </form>
+                                                    } else {
+                                                        echo "<tr class='text-center'><td colspan='9'>No existen registros</td></tr>";
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+
                                         <?php endif; ?>
                                     </div>
 
