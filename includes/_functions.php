@@ -220,7 +220,6 @@ function solicitar_recuperacion()
             // Enviar el correo
             if ($mail->send()) {
                 echo "<script>window.location.href = '../includes/login.php';</script>";
-
             } else {
                 echo "<script>alert('Error al enviar el correo: {$mail->ErrorInfo}');</script>";
             }
@@ -248,6 +247,7 @@ function actualizar_registro()
         isset($_POST['mobile_locator']) &&
         isset($_POST['dispoci']) &&
         isset($_POST['com_estra']) &&
+        isset($_POST['id_usu_modifiy']) &&
         count($_POST['id_registro']) === count($_POST['conve_stra'])
     ) {
         // Iterar sobre los registros
@@ -260,14 +260,17 @@ function actualizar_registro()
             $mobile_locator = $_POST['mobile_locator'][$index];
             $dispoci = $_POST['dispoci'][$index];
             $com_estra = $_POST['com_estra'][$index];
-            $sql = "UPDATE registros SET 
-                conve_stra = :conve_stra,
-                comp_insti = :comp_insti,
-                opera_cam = :opera_cam,
-                ausentimo = :ausentimo,
-                mobile_locator = :mobile_locator,
-                dispoci = :dispoci,
-                com_estra = :com_estra
+            $id_usu_modifiy = $_POST['id_usu_modifiy'];
+
+            $sql = "UPDATE registros SET
+            conve_stra = :conve_stra,
+            comp_insti = :comp_insti,
+            opera_cam = :opera_cam,
+            ausentimo = :ausentimo,
+            mobile_locator = :mobile_locator,
+            dispoci = :dispoci,
+            com_estra = :com_estra,
+            id_usu_modifiy = :id_usu_modifiy
             WHERE id_registro = :id_registro";
             $stmt = $pdo->prepare($sql);
             // Vincular los parámetros
@@ -278,6 +281,7 @@ function actualizar_registro()
             $stmt->bindParam(':mobile_locator', $mobile_locator);
             $stmt->bindParam(':dispoci', $dispoci);
             $stmt->bindParam(':com_estra', $com_estra);
+            $stmt->bindParam(':id_usu_modifiy', $id_usu_modifiy);
             $stmt->bindParam(':id_registro', $id_registro);
 
             // Ejecutar la consulta

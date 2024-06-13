@@ -88,7 +88,7 @@ $stmt_rol->bindParam(':id', $_SESSION['rol_id']);
 $stmt_rol->execute();
 $rol = $stmt_rol->fetch(PDO::FETCH_ASSOC)['rol'];
 
-$query_nombre_apellido = "SELECT nombre, apellido FROM public.user WHERE correo = :correo";
+$query_nombre_apellido = "SELECT id,nombre, apellido FROM public.user WHERE correo = :correo";
 $stmt_nombre_apellido = $pdo->prepare($query_nombre_apellido);
 $stmt_nombre_apellido->bindParam(':correo', $validar);
 $stmt_nombre_apellido->execute();
@@ -96,6 +96,7 @@ $datos_usuario = $stmt_nombre_apellido->fetch(PDO::FETCH_ASSOC);
 
 $nombre_usuario = $datos_usuario['nombre'];
 $apellido_usuario = $datos_usuario['apellido'];
+$id_usuario= $datos_usuario['id'];
 
 ?>
 
@@ -182,6 +183,7 @@ $apellido_usuario = $datos_usuario['apellido'];
           <div class="info">
             <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
             <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
+            <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $id_usuario; ?></label>
           </div>
         </div>
         <nav class="mt-2">
@@ -501,6 +503,7 @@ $apellido_usuario = $datos_usuario['apellido'];
                             ?>
                           </tbody>
                         </table>
+                        <input type="hidden" name="id_usu_modifiy" value="<?= $id_usuario ?>">
                         <input type="hidden" name="accion" value="actualizar_registro">
                         <button type="submit" class="btn btn-primary">Editar</button>
                       </form>
