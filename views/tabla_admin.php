@@ -183,12 +183,10 @@ $id_usuario= $datos_usuario['id'];
           <div class="info">
             <label class="d-block" style="color: #a6abb4; text-align: center; font-weight: normal;"><?php echo $nombre_usuario . " " . $apellido_usuario; ?></label>
             <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $rol; ?></label>
-            <label class="d-block" style="color:#a6abb4; text-align:center; "> <?php echo $id_usuario; ?></label>
           </div>
         </div>
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
             <?php
             // Obtener el ID de rol del usuario de la sesión
             $rol_id = $_SESSION['rol_id'];

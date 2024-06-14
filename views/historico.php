@@ -50,7 +50,7 @@ if (!in_array($pagina_actual, $permisos[$_SESSION['rol_id']])) {
 $selectedCentro = isset($_GET['centro']) ? $_GET['centro'] : '';
 $tipoFiltro = isset($_GET['tipoFiltro']) ? $_GET['tipoFiltro'] : '';
 $anio = isset($_GET['anio']) ? $_GET['anio'] : '';
-$mes = isset($_GET['mes']) ? $_GET['mes'] : '';
+$anual = isset($_GET['anual']) ? $_GET['anual'] : '';
 $trimestre = isset($_GET['trimestre']) ? $_GET['trimestre'] : '';
 $fechaInicio = isset($_GET['fechaInicio']) ? $_GET['fechaInicio'] : '';
 $fechaFin = isset($_GET['fechaFin']) ? $_GET['fechaFin'] : '';
@@ -80,16 +80,16 @@ if (!empty($selectedCentro) && $selectedCentro != 'todos') {
 }
 
 switch ($tipoFiltro) {
-    case 'mensual':
-        if (!empty($anio) && !empty($mes)) {
-            $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = :anio AND EXTRACT(MONTH FROM r.created_at) = :mes";
-            $params['anio'] = $anio;
-            $params['mes'] = $mes;
+    case 'anual': // Filtro anual
+        if (!empty($anual)) {
+            $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = :anual";
+            $params['anual'] = $anual;
         }
         break;
     case 'trimestral':
-        if (!empty($trimestre)) {
-            $consulta .= " AND EXTRACT(QUARTER FROM r.created_at) = :trimestre";
+        if (!empty($anio) && !empty($trimestre)) {
+            $consulta .= " AND EXTRACT(YEAR FROM r.created_at) = :anio AND EXTRACT(QUARTER FROM r.created_at) = :trimestre";
+            $params['anio'] = $anio;
             $params['trimestre'] = $trimestre;
         }
         break;
@@ -105,7 +105,7 @@ switch ($tipoFiltro) {
 }
 
 // Ordenar por fecha de creación
-$consulta .= " ORDER BY r.created_at";  // Añadir ordenamiento al final de la consulta
+$consulta .= " ORDER BY r.created_at";
 
 // Prepare and execute the query
 $stmt = $pdo->prepare($consulta);
@@ -539,32 +539,55 @@ $apellido_usuario = $datos_usuario['apellido'];
                                                     <label for="tipoFiltro">Tipo de filtro:</label>
                                                     <select id="tipoFiltro" name="tipoFiltro" class="form-control" required onchange="mostrarFiltros()">
                                                         <option value="">Seleccione el tipo de filtro</option>
-                                                        <option value="mensual" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'mensual' ? 'selected' : ''; ?>>Anual</option>
+                                                        <option value="anual" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'anual' ? 'selected' : ''; ?>>Anual</option>
                                                         <option value="trimestral" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'trimestral' ? 'selected' : ''; ?>>Trimestral</option>
                                                         <option value="rango" <?php echo isset($_GET['tipoFiltro']) && $_GET['tipoFiltro'] == 'rango' ? 'selected' : ''; ?>>Rango de fechas</option>
                                                     </select>
 
-                                                    <div id="filtroMensual" style="display: none;">
-                                                        <label for="anio">Seleccione el año:</label>
-                                                        <select id="anio" name="anio" class="form-control">
-                                                            <option value="">Seleccione un año </option>
+                                                    <div id="filtroAnual" style="display: none;">
+                                                        <label for="anioAnual">Seleccione el año:</label>
+                                                        <select id="anioAnual" name="anual" class="form-control">
+                                                            <option value="">Seleccione un año</option>
                                                             <?php
                                                             $currentYear = date("Y");
+                                                            $selectedAnual = isset($_GET['anual']) ? $_GET['anual'] : '';
                                                             for ($i = $currentYear; $i >= 2000; $i--) {
-                                                                echo "<option value='$i'>$i</option>";
+                                                                $selected = $i == $selectedAnual ? 'selected' : '';
+                                                                echo "<option value='$i' $selected>$i</option>";
                                                             }
                                                             ?>
                                                         </select>
                                                     </div>
 
                                                     <div id="filtroTrimestral" style="display: none;">
+                                                        <label for="anioTrimestral">Seleccione el año:</label>
+                                                        <select id="anioTrimestral" name="anio" class="form-control">
+                                                            <option value="">Seleccione un año</option>
+                                                            <?php
+                                                            $selectedTrimestral = isset($_GET['anio']) ? $_GET['anio'] : '';
+                                                            for ($i = $currentYear; $i >= 2000; $i--) {
+                                                                $selected = $i == $selectedTrimestral ? 'selected' : '';
+                                                                echo "<option value='$i' $selected>$i</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+
                                                         <label for="trimestre">Seleccione el trimestre:</label>
                                                         <select id="trimestre" name="trimestre" class="form-control">
-                                                            <option value="">Seleccione un trimestre </option>
-                                                            <option value="1">Primer trimestre (Enero - Marzo)</option>
-                                                            <option value="2">Segundo trimestre (Abril - Junio)</option>
-                                                            <option value="3">Tercer trimestre (Julio - Septiembre)</option>
-                                                            <option value="4">Cuarto trimestre (Octubre - Diciembre)</option>
+                                                            <option value="">Seleccione un trimestre</option>
+                                                            <?php
+                                                            $selectedTrimestre = isset($_GET['trimestre']) ? $_GET['trimestre'] : '';
+                                                            $trimestres = [
+                                                                1 => 'Primer trimestre (Enero - Marzo)',
+                                                                2 => 'Segundo trimestre (Abril - Junio)',
+                                                                3 => 'Tercer trimestre (Julio - Septiembre)',
+                                                                4 => 'Cuarto trimestre (Octubre - Diciembre)'
+                                                            ];
+                                                            foreach ($trimestres as $key => $value) {
+                                                                $selected = $key == $selectedTrimestre ? 'selected' : '';
+                                                                echo "<option value='$key' $selected>$value</option>";
+                                                            }
+                                                            ?>
                                                         </select>
                                                     </div>
 
@@ -809,7 +832,7 @@ $apellido_usuario = $datos_usuario['apellido'];
     <script>
         function mostrarFiltros() {
             const tipoFiltro = document.getElementById('tipoFiltro').value;
-            document.getElementById('filtroMensual').style.display = (tipoFiltro === 'mensual') ? 'block' : 'none';
+            document.getElementById('filtroAnual').style.display = (tipoFiltro === 'anual') ? 'block' : 'none';
             document.getElementById('filtroTrimestral').style.display = (tipoFiltro === 'trimestral') ? 'block' : 'none';
             document.getElementById('filtroRangoFechas').style.display = (tipoFiltro === 'rango') ? 'block' : 'none';
         }
@@ -918,12 +941,19 @@ $apellido_usuario = $datos_usuario['apellido'];
                 // Limpiar los valores de los input type date
                 document.getElementById('fechaInicio').value = '';
                 document.getElementById('fechaFin').value = '';
-                document.getElementById('tipoFiltro').value = '';
-                document.getElementById('anio').value = '';
+
+                // Limpiar los valores de los selectores
+                document.getElementById('anioAnual').value = '';
+                document.getElementById('anioTrimestral').value = '';
                 document.getElementById('trimestre').value = '';
 
                 // Limpiar la selección del centro
                 document.getElementById('centroSelect').selectedIndex = 0;
+
+                // Limpiar el valor del tipo de filtro si es necesario
+                if (document.getElementById('tipoFiltro')) {
+                    document.getElementById('tipoFiltro').value = '';
+                }
             }
         </script>
         <script>
