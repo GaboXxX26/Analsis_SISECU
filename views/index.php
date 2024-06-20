@@ -3,13 +3,6 @@ include "../includes/_db.php";
 session_start();
 error_reporting(0);
 
-$validar = $_SESSION['correo'];
-
-if ($validar == null || $validar == '') {
-
-    header("Location: ./includes/login.php");
-    die();
-}
 ?>
 <form action="../includes/validar.php" method="POST">
     <div id="login">
@@ -21,27 +14,27 @@ if ($validar == null || $validar == '') {
                         <h3 class="text-center">Registro de nuevo usuario</h3>
                         <div class="form-group">
                             <label for="nombre" class="form-label">Nombre: </label>
-                            <input type="text" id="nombre" name="nombre" class="form-control" require>
+                            <input type="text" id="nombre" name="nombre" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="apellido" class="form-label">Apellido:</label>
-                            <input type="text" id="apellido" name="apellido" class="form-control" require>
+                            <input type="text" id="apellido" name="apellido" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="username">Correo:</label><br>
-                            <input type="email" name="correo" id="correo" class="form-control" placeholder="" require>
+                            <input type="email" name="correo" id="correo" class="form-control" placeholder="" required>
                         </div>
                         <div class="form-group">
                             <label for="telefono" class="form-label">Telefono:</label>
-                            <input type="text" id="telefono" name="telefono" class="form-control" require>
+                            <input type="text" id="telefono" name="telefono" class="form-control" required pattern="\d{10}" title="El telefono debe contener exactamente 10 dígitos">
                         </div>
                         <div class="form-group">
                             <label for="dni" class="form-label">Cedula:</label>
-                            <input type="text" id="dni" name="dni" class="form-control" require>
+                            <input type="text" id="dni" name="dni" class="form-control" required pattern="\d{10}" title="La cedula debe contener exactamente 10 dígitos">
                         </div>
                         <div class="form-group">
                             <label for="genero" class="form-label">Género:</label>
-                            <select id="genero" name="genero" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;">
+                            <select id="genero" name="genero" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
@@ -53,15 +46,15 @@ if ($validar == null || $validar == '') {
                         </div>
                         <div class="form-group">
                             <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento:</label>
-                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control">
+                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="password">Contraseña:</label><br>
-                            <input type="password" name="password" id="password" class="form-control" require>
+                            <input type="password" name="password" id="password" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="rol_id" class="form-label">Rol:</label>
-                            <select id="rol_id" name="rol_id" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" require>
+                            <select id="rol_id" name="rol_id" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="ad2e8033-4a14-40d6-a999-1f1c6467a5e6">Analista de datos</option>
                                 <option value="add38db6-1687-4e57-a763-a959400d9da2">Administrador</option>
@@ -70,7 +63,7 @@ if ($validar == null || $validar == '') {
                         </div>
                         <div class="form-group">
                             <label for="id_centro" class="form-label">Centro ECU911:</label>
-                            <select id="id_centro" name="id_centro" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" require>
+                            <select id="id_centro" name="id_centro" class="form-control select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;" required>
                                 <option value="" disabled selected>Seleccione una opción</option>
                                 <option value="ef48298f-cedf-4718-aa67-b097c80ef23b">Ambato</option>
                                 <option value="664f5ba3-84e3-40f9-afc3-2fc1a152f88b">Cuenca</option>

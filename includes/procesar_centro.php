@@ -3,15 +3,14 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include "_db.php";
-session_start();
 
 if (isset($_POST['registrar_centro'])) {
     $num_centros = 16;
 
     try {
         // Preparar la consulta de inserción
-        $consulta_insert = "INSERT INTO public.registros(id_registro, id_centro, conve_stra, comp_insti, opera_cam, ausentimo, mobile_locator, dispoci, com_estra, obv_conve_stra, obv_comp_insti, obv_opera_cam, obv_ausentimo, obv_mobile_locator, obv_dispoci, obv_com_estra, created_at)
-                            VALUES (uuid_generate_v4(), :id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra, :obv_conve_stra, :obv_comp_insti, :obv_opera_cam, :obv_ausentimo, :obv_mobile_locator, :obv_dispoci, :obv_com_estra, NOW())";
+        $consulta_insert = "INSERT INTO public.registros( id_centro, conve_stra, comp_insti, opera_cam, ausentimo, mobile_locator, dispoci, com_estra, obv_conve_stra, obv_comp_insti, obv_opera_cam, obv_ausentimo, obv_mobile_locator, obv_dispoci, obv_com_estra, created_at)
+                            VALUES (:id_centro, :conve_stra, :comp_insti, :opera_cam, :ausentimo, :mobile_locator, :dispoci, :com_estra, :obv_conve_stra, :obv_comp_insti, :obv_opera_cam, :obv_ausentimo, :obv_mobile_locator, :obv_dispoci, :obv_com_estra, NOW())";
         $stmt_insert = $pdo->prepare($consulta_insert);
 
         // Preparar la consulta de verificación
@@ -66,7 +65,7 @@ if (isset($_POST['registrar_centro'])) {
         }
 
         // Alerta de éxito (usando JavaScript)
-        echo "<script>window.location.href = '../views/tabla_admin.php?section=registro';</script>";
+        echo "<script>window.location.href = '../views/user.php';</script>";
     } catch (PDOException $e) {
 
         echo "<script>alert('Error al guardar los registros: " . $e->getMessage() . "'); window.history.back();</script>";

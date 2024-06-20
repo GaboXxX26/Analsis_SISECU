@@ -74,7 +74,7 @@ function editar_registro()
     $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_STR);
     $stmt->bindParam(':id_centro', $id_centro, PDO::PARAM_STR);
     $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
-    $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Asumiendo que el ID es un entero
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
     $stmt->execute();
 
@@ -102,7 +102,6 @@ function acceso_user()
     global $pdo;
     $correo = $_POST['correo'];
     $password_ingresada = $_POST['password'];  // Cambiamos el nombre de la variable
-    session_start();
 
     $key = "gt2513$%dhSDH^Whas@!@GDYEU!@&Dhahdihede#$#AhsahwDE#$#";
     // Reemplaza con una clave realmente segura
@@ -140,7 +139,7 @@ function acceso_user()
                         alert('Usuario o contrasenia incorrecta');
                         setTimeout(function() {
                             window.location.href = '../includes/login.php';
-                        }, 1000);
+                        }, 100);
                     </script>";
             }
         } else {
@@ -150,7 +149,7 @@ function acceso_user()
                     alert('Usuario o contrasenia incorrecta');
                     setTimeout(function() {
                         window.location.href = '../includes/login.php';
-                    }, 1000);
+                    }, 100);
                 </script>";
         }
     } catch (PDOException $e) {
